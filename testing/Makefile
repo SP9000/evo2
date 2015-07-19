@@ -1,4 +1,4 @@
-LIBS  = -levo2
+LIBS  = -levo2 -lSDL2
 CFLAGS = -Wall -L..
 
 SRC=$(wildcard *.c)

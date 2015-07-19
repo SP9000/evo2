@@ -2,7 +2,8 @@
 
 /* put test prototypes here */
 void TestEntity();
-extern void TestSigSlot();
+void TestSigSlot();
+void TestDraw();
 
 void Tests()
 {
@@ -14,6 +15,10 @@ void Tests()
   puts("\nDoing signal slot test");
   puts("-----------------------------------------");
   TestSigSlot();
+
+  puts("\nDoing draw test");
+  puts("-----------------------------------------");
+  TestDraw();
 }
 
 int main()

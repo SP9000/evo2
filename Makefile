@@ -2,11 +2,12 @@ LIBS  = -lm -lSDL2
 CFLAGS = -shared -Wall -fPIC
 
 SRC=$(wildcard *.c)
+TESTSRC=$(wildcard testing/*.c)
 
 libevo2.so: $(SRC)
 	gcc -o $@ $^ $(CFLAGS) $(LIBS)
 
-test: 
+test: $(TESTSRC) libevo2.so 
 	cd testing && $(MAKE)
 	mv testing/test .
 
