@@ -9,10 +9,10 @@
  */
 struct tv_Component
 {
-  unsigned id;      /** id is a unique ID used to refer to this component. */
-  void (*Start)();  /** Start initializes a component (run before update). */
-  void (*Update)(); /** Update runs a per-frame update on the component. */
-  size_t (*Size)();   /** Size returns the size (in bytes) of the component. */
+  unsigned id;                          /* id is a unique ID used to refer to this component. */
+  size_t (*Size)();                     /* Size returns the size (in bytes) of the component. */
+  void (*Start)(struct tv_Component*);  /* Start initializes a component (run before update). */
+  void (*Update)(struct tv_Component*); /* Update runs a per-frame update on the component. */
 };
 
 /** 
@@ -57,5 +57,26 @@ void tv_EntityStart(struct tv_Entity *e);
  * attached to e.
  */
 void tv_EntityUpdate(struct tv_Entity *e);
+
+/**
+ * tv_EntityGetComponent searches e for a component of the type id.
+ */
+void tv_EntityGetComponent(struct tv_Entity *e, unsigned id);
+
+/**
+ * tv_ComponentGenerateID assigns an unique value to id if id is 0, if id is
+ * non-zero, this function does nothing.
+ * All components should call this function in their New function to set the
+ * ID for that component. 
+ * for example: 
+ * MyComponentNew() 
+ * {
+ *   static unsigned id = 0;
+ *   struct tv_Component * c = malloc(sizeof(MyComponent));
+ *   c->id = tv_ComponentGenerateID(&id);
+ *   ...
+ * }
+ */
+void tv_ComponentGenerateID(unsigned *id);
 
 #endif

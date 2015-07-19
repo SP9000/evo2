@@ -48,9 +48,10 @@ void tv_EntityStart(struct tv_Entity *e)
 
   for(i = 0; i < e->_numComponents; ++i) 
   {
-    if(e->components[i]->Start) 
+    struct tv_Component *c = e->components[i];
+    if(c->Start)
     {
-      e->components[i]->Start();
+      c->Start(c);
     }
   }
 }
@@ -61,9 +62,10 @@ void tv_EntityUpdate(struct tv_Entity *e)
 
   for(i = 0; i < e->_numComponents; ++i) 
   {
-    if(e->components[i]->Update) 
+    struct tv_Component *c = e->components[i];
+    if(c->Update) 
     {
-      e->components[i]->Update();
+      c->Update(c);
     }
   }
 }
@@ -81,3 +83,12 @@ struct tv_Entity * tv_EntityCopy(struct tv_Entity *e)
   return ret;
 }
 
+void tv_ComponentGenerateID(unsigned *id)
+{
+  static unsigned nextID = 1;
+  if(*id == 0) 
+  {
+    *id = nextID;
+    nextID++;
+  }
+}

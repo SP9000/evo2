@@ -1,4 +1,4 @@
-LIBS  = -lm
+LIBS  = -lm -lSDL2
 CFLAGS = -shared -Wall -fPIC
 
 SRC=$(wildcard *.c)
