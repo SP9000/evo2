@@ -85,3 +85,15 @@ struct tv_Entity * tv_EntityCopy(struct tv_Entity *e)
   return ret;
 }
 
+struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id)
+{
+  unsigned i;
+  for(i = 0; i < e->_numComponents; ++i)
+  {
+    if(e->components[i]->id == id)
+    {
+      return e->components[i];
+    }
+  }
+  return NULL;
+}

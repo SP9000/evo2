@@ -61,7 +61,7 @@ typedef struct tv_Vector4
 	float x, y, z, w;
 }tv_Vector4;
 
-typedef tv_Vector4 tv_quaternion;
+typedef tv_Vector4 tv_Quaternion;
 
 extern const tv_Vector2 tv_Vector2Zero;
 extern const tv_Vector3 tv_Vector3Zero;

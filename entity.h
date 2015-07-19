@@ -62,6 +62,6 @@ void tv_EntityUpdate(struct tv_Entity *e);
 /**
  * tv_EntityGetComponent searches e for a component of the type id.
  */
-void tv_EntityGetComponent(struct tv_Entity *e, unsigned id);
+struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id);
 
 #endif
