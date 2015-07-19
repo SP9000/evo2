@@ -10,6 +10,7 @@
 struct tv_Component
 {
   unsigned id;                          /* id is a unique ID used to refer to this component. */
+  struct tv_Entity *entity;             /* entity is the entity the component is attached to. */
   size_t (*Size)();                     /* Size returns the size (in bytes) of the component. */
   void (*Start)(struct tv_Component*);  /* Start initializes a component (run before update). */
   void (*Update)(struct tv_Component*); /* Update runs a per-frame update on the component. */

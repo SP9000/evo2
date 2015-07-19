@@ -49,6 +49,8 @@ void tv_EntityStart(struct tv_Entity *e)
   for(i = 0; i < e->_numComponents; ++i) 
   {
     struct tv_Component *c = e->components[i];
+
+    c->entity = e;
     if(c->Start)
     {
       c->Start(c);
