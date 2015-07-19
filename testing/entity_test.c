@@ -2,6 +2,12 @@
 #include "test.h"
 #include "../entity.h"
 
+enum
+{
+  COMPONENT_COMPONENTA = 1,
+  COMPONENT_COMPONENTB
+};
+
 static void UpdateA(struct tv_Component *c)
 {
   printf(" updating A (id: %d)\n", c->id);
@@ -21,14 +27,13 @@ static size_t SizeA()
 }
 struct ComponentA * NewA() 
 {
-  static unsigned id = 0;
   struct ComponentA * a;
   struct tv_Component * c;
 
-  tv_ComponentGenerateID(&id);
   a = malloc(sizeof(struct ComponentA));
   c = (struct tv_Component*)a;
-  c->id = id;
+
+  c->id = COMPONENT_COMPONENTA;
   c->Start = StartA;
   c->Update = UpdateA;
   c->Size = SizeA;
@@ -55,15 +60,13 @@ static size_t SizeB()
 }
 struct ComponentB * NewB() 
 {
-  static unsigned id = 0;
   struct ComponentB * b;
   struct tv_Component * c;
 
   b = malloc(sizeof(struct ComponentB));
   c = (struct tv_Component*)b;
 
-  tv_ComponentGenerateID(&id);
-  c->id = id;
+  c->id = COMPONENT_COMPONENTB;
   c->Start = StartB;
   c->Update = UpdateB;
   c->Size = SizeB;

@@ -83,12 +83,3 @@ struct tv_Entity * tv_EntityCopy(struct tv_Entity *e)
   return ret;
 }
 
-void tv_ComponentGenerateID(unsigned *id)
-{
-  static unsigned nextID = 1;
-  if(*id == 0) 
-  {
-    *id = nextID;
-    nextID++;
-  }
-}

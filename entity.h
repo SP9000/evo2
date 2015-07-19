@@ -63,20 +63,4 @@ void tv_EntityUpdate(struct tv_Entity *e);
  */
 void tv_EntityGetComponent(struct tv_Entity *e, unsigned id);
 
-/**
- * tv_ComponentGenerateID assigns an unique value to id if id is 0, if id is
- * non-zero, this function does nothing.
- * All components should call this function in their New function to set the
- * ID for that component. 
- * for example: 
- * MyComponentNew() 
- * {
- *   static unsigned id = 0;
- *   struct tv_Component * c = malloc(sizeof(MyComponent));
- *   c->id = tv_ComponentGenerateID(&id);
- *   ...
- * }
- */
-void tv_ComponentGenerateID(unsigned *id);
-
 #endif
