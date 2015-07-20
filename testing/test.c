@@ -25,6 +25,10 @@ void Tests()
   puts("\nDoing engine test");
   puts("-----------------------------------------");
   TestEngine();
+
+  puts("\nDoing component test");
+  puts("-----------------------------------------");
+  TestComponents();
 }
 
 int main()
