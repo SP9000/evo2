@@ -4,6 +4,8 @@
 void TestEntity();
 void TestSigSlot();
 void TestDraw();
+void TestEngine();
+void TestComponents();
 
 void Tests()
 {
@@ -19,6 +21,10 @@ void Tests()
   puts("\nDoing draw test");
   puts("-----------------------------------------");
   TestDraw();
+
+  puts("\nDoing engine test");
+  puts("-----------------------------------------");
+  TestEngine();
 }
 
 int main()

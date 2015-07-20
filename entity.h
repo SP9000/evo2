@@ -33,6 +33,11 @@ struct tv_Entity
 struct tv_Entity * tv_EntityNew(const char *name);
 
 /**
+ * tv_EntityDestroy destroys an entity and all its components.
+ */
+void tv_EntityDestroy(struct tv_Entity *e);
+
+/**
  * tv_EntityCopy performs a deep copy of e and returns a pointer to the copy.
  */
 struct tv_Entity * tv_EntityCopy(struct tv_Entity* e);
@@ -58,6 +63,12 @@ void tv_EntityStart(struct tv_Entity *e);
  * attached to e.
  */
 void tv_EntityUpdate(struct tv_Entity *e);
+
+/**
+ * tv_EntityUpdateAll updates all entities that have been created with 
+ * tv_EntityNew.
+ */
+void tv_EntityUpdateAll();
 
 /**
  * tv_EntityGetComponent searches e for a component of the type id.

@@ -3,12 +3,34 @@
 #include <string.h>
 #include "entity.h"
 
+#define MAX_ENTITIES 10000
+
+static struct tv_Entity *entities[MAX_ENTITIES];
+static int numEntities;
+
 struct tv_Entity * tv_EntityNew(const char *name)
 {
   struct tv_Entity *e = (struct tv_Entity*)malloc(sizeof(struct tv_Entity));
   strncpy(e->name, name, 31);
   e->_numComponents = 0;
+
+  entities[numEntities] = e;
+  numEntities++;
+
   return e;
+}
+
+void tv_EntityDestroy(struct tv_Entity *e)
+{
+  int i;
+  for(i = numEntities-1; i >= 0; --i)
+  {
+    if(entities[i] == e)
+    {
+      entities[i] = NULL;
+      numEntities--;
+    }
+  }
 }
 
 void tv_EntityAdd(struct tv_Entity **e, struct tv_Component *c)
@@ -96,4 +118,13 @@ struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id)
     }
   }
   return NULL;
+}
+
+void tv_EntityUpdateAll()
+{
+  int i;
+  for(i = 0; i < numEntities; ++i) 
+  {
+    tv_EntityUpdate(entities[i]);
+  }
 }

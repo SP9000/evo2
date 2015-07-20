@@ -20,8 +20,6 @@ void TestDraw()
   puts("finishing frame...");
   tv_DrawEndFrame();
 
-  SDL_Delay(3000);
-
   puts("\ndone");
   tv_DrawQuit();
 }
