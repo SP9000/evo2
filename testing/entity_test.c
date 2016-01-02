@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include "test.h"
 #include "../entity.h"
+#include "../systems/sys_render.h"
 
 enum
 {
@@ -8,10 +9,28 @@ enum
   COMPONENT_COMPONENTB
 };
 
-static void UpdateA(struct tv_Component *c)
+
+struct SystemA
 {
-  printf(" updating A (id: %d)\n", c->id);
+  struct tv_System sys;
+};
+static bool ImplementsA(struct tv_Entity *e)
+{
+  return tv_EntityGetComponent(e, COMPONENT_COMPONENTA) != NULL;
 }
+static void UpdateA(struct tv_Entity *e)
+{
+  puts(" updating A");
+}
+struct SystemA * NewSysA()
+{
+  struct tv_System *sys;
+  sys = malloc(sizeof(struct SystemA));
+  sys->Implements = ImplementsA;
+  sys->Update = UpdateA;
+  return sys;
+}
+
 static void StartA(struct tv_Component *c)
 {
   puts(" starting A");
@@ -35,7 +54,6 @@ struct ComponentA * NewA()
 
   c->id = COMPONENT_COMPONENTA;
   c->Start = StartA;
-  c->Update = UpdateA;
   c->Size = SizeA;
   return a;
 }
@@ -46,10 +64,6 @@ struct ComponentB
   struct tv_Component c;
   int val;
 };
-static void UpdateB(struct tv_Component *c)
-{
-  printf(" updating B (id: %d)\n", c->id);
-}
 static void StartB(struct tv_Component *c)
 {
   puts(" starting B");
@@ -68,7 +82,6 @@ struct ComponentB * NewB()
 
   c->id = COMPONENT_COMPONENTB;
   c->Start = StartB;
-  c->Update = UpdateB;
   c->Size = SizeB;
   return b;
 }
@@ -86,6 +99,9 @@ bool TestEntity()
   a = NewA();
   b = NewB();
 
+  puts("creating systems...");
+  tv_RegisterSystem(NewSysA());
+
   puts("creating entity...");
   e = tv_EntityNew("dog");
 
@@ -97,7 +113,7 @@ bool TestEntity()
   puts("starting...");
   tv_EntityStart(e);
   puts("updating...");
-  tv_EntityUpdate(e);
+  tv_UpdateSystems();
   puts("");
 
   puts("removing components...");
@@ -106,8 +122,7 @@ bool TestEntity()
   puts("starting...");
   tv_EntityStart(e);
   puts("updating...");
-  tv_EntityUpdate(e);
-
+  tv_UpdateSystems();
   puts("");
 
   puts("done");

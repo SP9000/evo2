@@ -10,7 +10,6 @@ struct Spritesheet
   int  xStep, yStep; /* the spacing between each tile. */
   int  w, h;         /* the width/height of the spritesheet */
   char name[31] ;    /* the name the spritesheet is loaded from */
-
   SDL_Texture *tex;
 };
 

@@ -5,10 +5,6 @@ static void Start()
 {
 }
 
-static void Update()
-{
-}
-
 static size_t Size()
 {
   return sizeof(struct Transform);
@@ -24,7 +20,6 @@ struct Transform * NewTransform()
 
   c->id     = COMPONENT_TRANSFORM;
   c->Size   = Size;
-  c->Update = Update;
   c->Start  = Start;
 
   t->pos     = tv_Vector3Zero;

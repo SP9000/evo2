@@ -29,7 +29,6 @@ void TestComponents()
   tv_EntityStart(e);
 
   tv_DrawStartFrame();
-  tv_EntityUpdate(e);
   tv_DrawEndFrame();
 
   puts("\ndone");

@@ -1,6 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 /**
@@ -13,7 +14,6 @@ struct tv_Component
   struct tv_Entity *entity;             /* entity is the entity the component is attached to. */
   size_t (*Size)();                     /* Size returns the size (in bytes) of the component. */
   void (*Start)(struct tv_Component*);  /* Start initializes a component (run before update). */
-  void (*Update)(struct tv_Component*); /* Update runs a per-frame update on the component. */
 };
 
 /** 
@@ -59,16 +59,15 @@ void tv_EntityRemove(struct tv_Entity **e, struct tv_Component *c);
 void tv_EntityStart(struct tv_Entity *e);
 
 /**
- * tv_EntityUpdate updates an entity by "Update"ing all the components
- * attached to e.
+ * tv_EntityUpdateAll runs update on all entities in the engine.
  */
-void tv_EntityUpdate(struct tv_Entity *e);
+void tv_EntityUpdateAll(bool (*test)(struct tv_Entity *),
+    void (*update)(struct tv_Entity *));
 
 /**
- * tv_EntityUpdateAll updates all entities that have been created with 
- * tv_EntityNew.
+ * tv_EntityNumComponents returns the number of components attached to e. 
  */
-void tv_EntityUpdateAll();
+unsigned tv_EntityNumComponents(struct tv_Entity *e);
 
 /**
  * tv_EntityGetComponent searches e for a component of the type id.

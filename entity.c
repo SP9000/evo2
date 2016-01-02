@@ -80,16 +80,16 @@ void tv_EntityStart(struct tv_Entity *e)
   }
 }
 
-void tv_EntityUpdate(struct tv_Entity *e)
+void tv_EntityUpdateAll(bool (*test)(struct tv_Entity*), 
+    void (*update)(struct tv_Entity *))
 {
   unsigned i;
 
-  for(i = 0; i < e->_numComponents; ++i) 
+  for(i = 0; i < numEntities; ++i)
   {
-    struct tv_Component *c = e->components[i];
-    if(c->Update) 
+    if(test(entities[i]))
     {
-      c->Update(c);
+      update(entities[i]);
     }
   }
 }
@@ -120,11 +120,3 @@ struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id)
   return NULL;
 }
 
-void tv_EntityUpdateAll()
-{
-  int i;
-  for(i = 0; i < numEntities; ++i) 
-  {
-    tv_EntityUpdate(entities[i]);
-  }
-}

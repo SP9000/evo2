@@ -3,9 +3,10 @@ CFLAGS = -Wall -L..
 
 SRC=$(wildcard *.c) 
 CSRC=$(wildcard ../components/*.c) 
+SSRC=$(wildcard ../systems/*.c)
 
-test: $(SRC) $(CSRC)
-	gcc -o $@ $(SRC) $(CSRC) $(CFLAGS) $(LIBS)
+test: $(SRC) $(CSRC) $(SSRC)
+	gcc -o $@ $(SRC) $(CSRC) $(SSRC) $(CFLAGS) $(LIBS)
 
 clean:
 	rm test

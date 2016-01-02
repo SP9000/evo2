@@ -29,7 +29,7 @@ void tv_EngineTick()
       run = false;
     }
   }
-  tv_EntityUpdateAll();
+  /* TODO: update systems */
   tv_DrawEndFrame();
 }
 

@@ -38,35 +38,13 @@ static struct Spritesheet * LoadSheet(const char *fileName)
   sheet->yStep = 32;
 
   numSheets++;
-
   SDL_FreeSurface(surf);
   return sheet;
 }
 
 static void Start(struct tv_Component *c)
 {
-  struct Render *r;
-  r = (struct Render*)c;
-
-  r->transform = (struct Transform*)tv_EntityGetComponent(c->entity, COMPONENT_TRANSFORM);
-  assert(r->transform);
-}
-
-/* TODO: for now, Update just renders a rectangle. */
-static void Update(struct tv_Component *c)
-{
-  struct Render *r;
-  SDL_Rect renderQuad;
-  
-  r = (struct Render*)c;
-
-  renderQuad.x = 0;
-  renderQuad.y = 0;
-  renderQuad.w = r->transform->scale.x * 32;
-  renderQuad.h = r->transform->scale.y * 32;
-  
-  SDL_SetRenderDrawColor(tv_DrawGetRenderer(), 255, 255, 0, 255);
-  SDL_RenderFillRect(tv_DrawGetRenderer(), &renderQuad);
+  assert(tv_EntityGetComponent(c->entity, COMPONENT_TRANSFORM));
 }
 
 static size_t Size()
@@ -85,10 +63,12 @@ struct Render * NewRender()
   c->id     = COMPONENT_RENDER;
   c->Size   = Size;
   c->Start  = Start;
-  c->Update = Update;
-
   r->sheet = NULL;  
 
   return r;
 }
 
+unsigned tv_EntityNumComponents(struct tv_Entity *e)
+{
+  return e->_numComponents;
+}
