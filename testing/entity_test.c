@@ -9,7 +9,6 @@ enum
   COMPONENT_COMPONENTB
 };
 
-
 struct SystemA
 {
   struct tv_System sys;

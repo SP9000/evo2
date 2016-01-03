@@ -26,11 +26,6 @@ static void Update(struct tv_Entity *e)
   SDL_RenderFillRect(tv_DrawGetRenderer(), &renderQuad);
 }
 
-static size_t Size()
-{
-  return sizeof(struct Render);
-}
-
 struct sys_Render * NewRenderSystem()
 {
   struct tv_System *sys;
