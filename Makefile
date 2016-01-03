@@ -3,8 +3,9 @@ CFLAGS = -shared -Wall -fPIC
 
 SRC=$(wildcard *.c)
 TESTSRC=$(wildcard testing/*.c)
+BASECSRC=$(wildcard components/*.c) # base components for engine
 
-libevo2.so: $(SRC)
+libevo2.so: $(SRC) $(BASECSRC)
 	gcc -o $@ $^ $(CFLAGS) $(LIBS)
 
 test: $(TESTSRC) libevo2.so 

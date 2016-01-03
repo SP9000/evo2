@@ -5,7 +5,7 @@
 
 struct sys_Render
 {
-  struct tv_System;
+  struct tv_System sys;
 };
 
 struct sys_Render * NewRenderSystem();

@@ -120,3 +120,8 @@ struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id)
   return NULL;
 }
 
+unsigned tv_EntityNumComponents(struct tv_Entity *e)
+{
+  return e->_numComponents;
+}
+

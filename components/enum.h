@@ -17,6 +17,8 @@ enum
 {
   COMPONENT_TRANSFORM = 1,
   COMPONENT_RENDER,
+  COMPONENT_MESH,
+  COMPONENT_MATERIAL,
 
   COMPONENT_END /* must be at end - end of component enumeration */
 };
