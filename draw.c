@@ -35,12 +35,12 @@ int tv_DrawInit()
   glCtx = SDL_GL_CreateContext(win);
   if(glCtx == NULL){
     puts("error: failed to create GL context");
-    return NULL;
+    return -3;
   }
   glewExperimental = GL_TRUE;
   if(glewInit() != GLEW_OK){
     puts("error: failed to initialize GLEW");
-    return NULL;
+    return -4;
   }
   return 0;
 }

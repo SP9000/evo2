@@ -47,6 +47,50 @@
   void tv_Signal ## name ## Connect(struct tv_Signal ## name *sig, tv_Slot ## name slot);
 
 /**
+ * SIGDEF is a macro that defines the signal name (as previously prototyped by
+ * a SIGNAL macro).
+ * You should provide the same arguments to SIGDEF as you did in the SIGNAL
+ * declaration, but with SIGDEF it is also important that each argument is
+ * provided a name.  This is so that you can define the parameters to the
+ * emit function with the EMIT macro.
+ */
+#define SIGDEF(name, ...) \
+  void tv_Signal ## name ## Init(struct tv_Signal ## name *sig) \
+  { \
+    struct tv_Signal *s; \
+    s = (struct tv_Signal*)sig; \
+    s->_active = true; \
+    s->_numSlots = 0; \
+  } \
+  void tv_Signal ## name ## Connect(struct tv_Signal ## name *sig, tv_Slot ## name slot) \
+  { \
+    struct tv_Signal *s; \
+    s = (struct tv_Signal*)sig; \
+    if(s->_numSlots < TV_SIGNAL_MAX_SLOTS) \
+    { \
+      sig->slots[s->_numSlots] = slot; \
+      s->_numSlots++; \
+    } \
+  }  \
+  void tv_Signal ## name ## Emit(struct tv_Signal ## name *sig, ## __VA_ARGS__) \
+  { \
+    unsigned i; \
+    struct tv_Signal *s; \
+    s = (struct tv_Signal*)sig; \
+    for(i = 0; i < s->_numSlots; ++i) \
+    { 
+
+/**
+ * EMIT is a macro that must be placed immediately following a SIGNAL macro.
+ * It provides the arguments passed to every slot called when a signal is 
+ * emitted. 
+ */
+#define EMIT(...) \
+      sig->slots[i](__VA_ARGS__); \
+    } \
+  }
+
+/**
  * tv_Signal is a struct that contains basic information used to trigger slots
  */
 struct tv_Signal 
