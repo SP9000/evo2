@@ -14,6 +14,7 @@
  */
 enum tv_AttrType
 {
+  TV_VERTEX_ATTR_START=1<<0,
   TV_VERTEX_ATTR_POS=1<<0,
   TV_VERTEX_ATTR_COL=1<<1,
   TV_VERTEX_ATTR_UV=1<<2,

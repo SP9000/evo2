@@ -23,10 +23,4 @@ void tv_DrawStartFrame();
  */
 void tv_DrawEndFrame();
 
-/**
- * tv_DrawGetRenderer returns the renderer that is associated with the engine's
- * window.
- */
-SDL_Renderer * tv_DrawGetRenderer();
-
 #endif

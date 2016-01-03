@@ -40,7 +40,7 @@ struct tv_Mesh * tv_NewMesh(int format, int n)
   struct tv_Mesh *m;
 
   /* calculate the vertex size */
-  for(i=1, sz=0; i < TV_VERTEX_ATTR_END; i<<=1)
+  for(i=TV_VERTEX_ATTR_START, sz=0; i < TV_VERTEX_ATTR_END; i<<=1)
   {
     if(format&i == 0)
     {
@@ -76,7 +76,8 @@ void tv_MeshAppend(struct tv_Mesh *mesh, void *vtx)
     mesh->allocSize = mesh->numVertices + 100;
   }
 
-  for(i=1, v=mesh->vertices; i < TV_VERTEX_ATTR_END; i<<=1, v+=sz)
+  for(i=TV_VERTEX_ATTR_START, v=mesh->vertices; i < TV_VERTEX_ATTR_END;
+     i<<=1, v+=sz)
   {
     sz = 0;
     if(mesh->format&i == 0)
