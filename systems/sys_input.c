@@ -26,8 +26,13 @@ static void Update(struct tv_Entity *e)
       case SDL_QUIT:
         break;
       case SDL_KEYDOWN:
+        tv_SignalButtonDownEmit(evt.key.keysym.scancode);
+        break;
+      case SDL_KEYUP:
+        tv_SignalButtonUpEmit(evt.key.keysym.scancode);
         break;
       case SDL_MOUSEMOTION:
+        tv_SignalMouseMoveEmit(evt.motion.x, evt.motion.y);
         break;
       default:
         break;

@@ -32,11 +32,11 @@ typedef struct tagTvTransform {
 /**
  * A type for representing a rectangle.
  */
-typedef struct tagRect 
+struct tv_Rect 
 {
     float x, y;
     float w, h;
-}tv_Rect;
+};
 
 /**
  * Checks if the given rectangle contains the given point.
@@ -44,14 +44,14 @@ typedef struct tagRect
  * @param point the point to determine if is in the bounds of the rect or not.
  * @return TRUE if the rectangle does contain the point, else FALSE.
  */
-bool tv_RectContains(tv_Rect r, tv_Vector2 point);
+bool tv_RectContains(struct tv_Rect r, tv_Vector2 point);
 /**
  * Checks if the given rectangle overlaps the other given rectangle.
  * @param r1 the first rectangle.
  * @param r2 the...second...rectangle.
  * @return TRUE if the rectangles overlap, else FALSE.
  */
-bool tv_RectOverlaps(tv_Rect* r1, tv_Rect* r2);
+bool tv_RectOverlaps(struct tv_Rect* r1, struct tv_Rect* r2);
 
 /**
  * A basic type for representing a point in 4-dimensional space

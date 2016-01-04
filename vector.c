@@ -210,7 +210,7 @@ void tv_Vector3Direction(tv_Vector3 v1, tv_Vector3 v2, tv_Vector3* result)
 	result->z = v1.z - v2.z;
 	tv_Vector3Normalize(*result, result);
 }
-bool tv_RectContains(tv_Rect r, tv_Vector2 point)
+bool tv_RectContains(struct tv_Rect r, tv_Vector2 point)
 {
     if((point.x >= r.x) &&  (point.x <= (r.x+r.w)) &&
             (point.y >= r.y) && (point.y <= (r.y+r.h))) {
@@ -218,7 +218,7 @@ bool tv_RectContains(tv_Rect r, tv_Vector2 point)
     }
     return false;
 }
-bool tv_RectOverlaps(tv_Rect* r1, tv_Rect* r2)
+bool tv_RectOverlaps(struct tv_Rect* r1, struct tv_Rect* r2)
 {
     if((r1->x < (r2->x+r2->w)) &&
             ((r1->x+r1->w) > r2->x) &&
