@@ -3,8 +3,8 @@
 
 #include "../system.h"
 
-struct sys_Render
-{
+/* sys_Render is the system responsible for all drawing */
+struct sys_Render{
   struct tv_System sys;
 };
 

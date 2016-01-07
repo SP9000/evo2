@@ -5,10 +5,10 @@
 static SDL_Window *win;
 static SDL_GLContext *glCtx;
 
+/* tv_DrawInit initializes the rendering system. */
 int tv_DrawInit()
 {
-  if(SDL_Init(SDL_INIT_VIDEO) < 0)
-  {
+  if(SDL_Init(SDL_INIT_VIDEO) < 0){
     printf("failed to initailize SDL. SDL_Error: %s\n", SDL_GetError());
     return -1;
   }
@@ -27,8 +27,7 @@ int tv_DrawInit()
   win = SDL_CreateWindow("evo2", SDL_WINDOWPOS_UNDEFINED, 
       SDL_WINDOWPOS_UNDEFINED, 640, 480,
       SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-  if(win == NULL )
-  {
+  if(win == NULL ){
     printf("failed to create window. SDL_Error: %s\n", SDL_GetError());
     return -2;
   }
@@ -45,16 +44,19 @@ int tv_DrawInit()
   return 0;
 }
 
+/* tv_DrawQuit deinitializes/frees resources used by the rendering system. */
 void tv_DrawQuit()
 {
   SDL_Quit();
 }
 
+/* tv_DrawStartFrame prepares for rendering a new frame. */
 void tv_DrawStartFrame()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+/*  tv_DrawEndFrame is called when all rendering for the current frame is done. */
 void tv_DrawEndFrame()
 {
   SDL_GL_SwapWindow(win);

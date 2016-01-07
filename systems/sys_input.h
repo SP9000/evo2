@@ -3,12 +3,8 @@
 
 #include "../system.h"
 
-/**
- * sys_Input is the system that handles the receiving and signalling of
- * input events.
- */
-struct sys_Input
-{
+/* sys_Input is the system that handles the receiving and signalling of I/O */
+struct sys_Input{
   struct tv_System sys;
 };
 

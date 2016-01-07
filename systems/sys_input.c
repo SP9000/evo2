@@ -3,12 +3,9 @@
 #include "../sigslot.h"
 #include "sys_input.h"
 
-SIGDEF(ButtonDown, int b)
-  EMIT(b)
-SIGDEF(ButtonUp, int b);
-  EMIT(b)
-SIGDEF(MouseMove, int x, int y);
-  EMIT(x, y)
+SIGDEF(ButtonDown)
+SIGDEF(ButtonUp)
+SIGDEF(MouseMove)
 
 /* Implements returns true since all entities may use this system */
 static bool Implements(struct tv_Entity *e)
@@ -23,19 +20,19 @@ static void Update(struct tv_Entity *e)
   SDL_Event evt;
   while(SDL_PollEvent(&evt)){
     switch(evt.type){
-      case SDL_QUIT:
-        break;
-      case SDL_KEYDOWN:
-        tv_SignalButtonDownEmit(evt.key.keysym.scancode);
-        break;
-      case SDL_KEYUP:
-        tv_SignalButtonUpEmit(evt.key.keysym.scancode);
-        break;
-      case SDL_MOUSEMOTION:
-        tv_SignalMouseMoveEmit(evt.motion.x, evt.motion.y);
-        break;
-      default:
-        break;
+    case SDL_QUIT:
+      break;
+    case SDL_KEYDOWN:
+      EMIT(ButtonDown, evt.key.keysym.scancode);
+      break;
+    case SDL_KEYUP:
+      EMIT(ButtonUp, evt.key.keysym.scancode);
+      break;
+    case SDL_MOUSEMOTION:
+      EMIT(MouseMove, evt.motion.x, evt.motion.y);
+      break;
+    default:
+      break;
     }
   }
 }
@@ -47,6 +44,6 @@ struct sys_Input * NewInputSystem()
   sys = malloc(sizeof(struct sys_Input));
   sys->Implements = Implements;
   sys->Update = Update;
-  return (struct sys_Input)sys;
+  return (struct sys_Input*)sys;
 }
 

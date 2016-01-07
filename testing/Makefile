@@ -1,4 +1,4 @@
-LIBS  = -levo2 -lSDL2
+LIBS  = -levo2 -lSDL2 -framework OpenGL -lglew
 CFLAGS = -Wall -L..
 
 SRC=$(wildcard *.c) 

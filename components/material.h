@@ -5,20 +5,16 @@
 #include "../entity.h"
 #include "../vector.h"
 
-/**
- * Material is a component that contains OpenGL handles for rendering.
- */
-struct Material
-{
+/* Material is a component that contains OpenGL handles for rendering. */
+struct Material{
   struct tv_Component co;
   GLuint program;
   GLuint fs, vs, gs;
-
   GLuint mvp; /* modelview-projection matrix uniform handle */
 };
 
-struct Mesh * NewMesh(int format, int n);
-void InitMesh(struct Mesh *m, int format, int n);
-void MeshAppend(struct Mesh *mesh, void *vtx);
+struct Mesh * NewMesh(int, int);
+void InitMesh(struct Mesh*, int, int);
+void MeshAppend(struct Mesh*, void*);
 
 #endif

@@ -1,22 +1,20 @@
 #include "test.h"
 #include "../sigslot.h"
 
-void slot() 
-{
-  puts(" signal detected");
+SIGNAL(TestSignal, int)
+SIGDEF(TestSignal)
+
+void slot(int a){
+  printf(" signal detected - received <%d>\n", a);
 }
 
 void TestSigSlot()
 {
-  struct tv_Signalv sig;
-
-  tv_SignalvInit(&sig);
   puts("connecting slot...");
-  tv_SignalvConnect(&sig, slot);
+  CONNECT(TestSignal, slot);
   puts("emitting signal...");
-  tv_SignalvEmit(&sig);
+  EMIT(TestSignal, 30);
 
-  puts("");
-  puts("done");
+  puts("\ndone");
 }
 

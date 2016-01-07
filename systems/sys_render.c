@@ -14,7 +14,6 @@ static void Update(struct tv_Entity *e)
 {
   struct Render *r;
   SDL_Rect renderQuad;
-  
   r = (struct Render*)tv_EntityGetComponent(e, COMPONENT_RENDER);
 }
 
