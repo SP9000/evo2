@@ -47,7 +47,10 @@
   void tv_Signal ## name ## Emit(struct sig_ ## name *sig, ## __VA_ARGS__); \
   void tv_Signal ## name ## Connect(struct sig_ ## name *sig, tv_Slot ## name slot);
 
-/* SIGDEF is a macro that defines a signal with the given name. */
+/* 
+ * SIGDEF is a macro that defines a signal with the given name. 
+ * Every SIGNAL declaration must have a matching SIGDEF.
+ */
 #define SIGDEF(name, ...) struct sig_ ## name name;
 
 /* CONNECT is a macro that connects sig to the given slot. */
