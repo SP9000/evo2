@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
+#include "debug.h"
 #include "draw.h"
 
 static SDL_Window *win;
@@ -9,7 +10,7 @@ static SDL_GLContext *glCtx;
 int tv_DrawInit()
 {
   if(SDL_Init(SDL_INIT_VIDEO) < 0){
-    printf("failed to initailize SDL. SDL_Error: %s\n", SDL_GetError());
+    debug_printf("failed to initailize SDL. SDL_Error: %s\n", SDL_GetError());
     return -1;
   }
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -28,17 +29,17 @@ int tv_DrawInit()
       SDL_WINDOWPOS_UNDEFINED, 640, 480,
       SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
   if(win == NULL ){
-    printf("failed to create window. SDL_Error: %s\n", SDL_GetError());
+    debug_printf("failed to create window. SDL_Error: %s\n", SDL_GetError());
     return -2;
   }
   glCtx = SDL_GL_CreateContext(win);
   if(glCtx == NULL){
-    puts("error: failed to create GL context");
+    debug_puts("error: failed to create GL context");
     return -3;
   }
   glewExperimental = GL_TRUE;
   if(glewInit() != GLEW_OK){
-    puts("error: failed to initialize GLEW");
+    debug_puts("error: failed to initialize GLEW");
     return -4;
   }
   return 0;

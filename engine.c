@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include "debug.h"
 #include "draw.h"
 #include "engine.h"
 #include "entity.h"
@@ -41,7 +42,7 @@ void tv_EngineRun()
 /* tv_EngineQuit halts execution of the engine's main loop. */
 void tv_EngineQuit()
 {
-  puts("kill signal detected- qutting...\n");
+  debug_puts("kill signal detected- qutting...\n");
   run = false;
 }
 
