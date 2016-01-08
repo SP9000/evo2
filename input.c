@@ -5,6 +5,7 @@
 SIGDEF(ButtonDown)
 SIGDEF(ButtonUp)
 SIGDEF(MouseMove)
+SIGDEF(Kill)
 
 /* Update polls for input and stores the input state for the current frame */
 void tv_InputUpdate()
@@ -13,6 +14,7 @@ void tv_InputUpdate()
   while(SDL_PollEvent(&evt)){
     switch(evt.type){
     case SDL_QUIT:
+      EMIT(Kill)
       break;
     case SDL_KEYDOWN:
       EMIT(ButtonDown, evt.key.keysym.scancode);
