@@ -2,11 +2,6 @@
 #include "../components/enum.h"
 #include "mesh.h"
 
-/* Start initializes the Mesh component */
-static void Start(struct tv_Component *c)
-{
-}
-
 /* Size returns the size of the Mesh component */
 static size_t Size()
 {
@@ -54,7 +49,6 @@ struct Mesh * NewMesh(int format, int n)
   c = (struct tv_Component*)m;
   c->id = COMPONENT_MESH;
   c->Size = Size;
-  c->Start = Start;
 
   return m;
 }

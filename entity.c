@@ -63,28 +63,22 @@ void tv_EntityRemove(struct tv_Entity **e, struct tv_Component *c)
   }
 }
 
-/*
- * tv_EntityStart initializes an entity by "Start"ing all the components
- * attached to e.
- */
-void tv_EntityStart(struct tv_Entity *e)
+/* tv_EntityStartAll runs start on all entities for which test is true. */
+void tv_EntityStartAll(bool (*test)(struct tv_Entity*), 
+    void (*start)(struct tv_Entity *))
 {
   unsigned i;
-
-  for(i = 0; i < e->_numComponents; ++i) {
-    struct tv_Component *c = e->components[i];
-    c->entity = e;
-    if(c->Start)
-      c->Start(c);
+  for(i = 0; i < numEntities; ++i){
+    if(test(entities[i]))
+      start(entities[i]);
   }
 }
 
-/* tv_EntityUpdateAll runs update on all entities in the engine. */
+/* tv_EntityUpdateAll runs update on all entities for which test is true. */
 void tv_EntityUpdateAll(bool (*test)(struct tv_Entity*), 
     void (*update)(struct tv_Entity *))
 {
   unsigned i;
-
   for(i = 0; i < numEntities; ++i){
     if(test(entities[i]))
       update(entities[i]);
@@ -104,6 +98,7 @@ struct tv_Entity * tv_EntityCopy(struct tv_Entity *e)
   return ret;
 }
 
+/* tv_EntityGetComponent returns e's component of type id - NULL if none. */
 struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id)
 {
   unsigned i;

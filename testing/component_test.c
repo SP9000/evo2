@@ -25,9 +25,6 @@ void TestComponents()
   tv_EntityAdd(&e, (struct tv_Component*)transform);
   tv_EntityAdd(&e, (struct tv_Component*)render);
 
-  /* simulate one game-tick */
-  tv_EntityStart(e);
-
   tv_DrawStartFrame();
   tv_DrawEndFrame();
 

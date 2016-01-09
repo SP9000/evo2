@@ -2,11 +2,6 @@
 #include "../components/enum.h"
 #include "material.h"
 
-/* Start initializes the Material component */
-static void Start(struct tv_Component *c)
-{
-}
-
 /* Size returns the size of the Material component */
 static size_t Size()
 {
@@ -24,7 +19,6 @@ struct Material * NewMaterial(const char *fs, const char *vs, const char *gs)
   c = (struct tv_Component*)m;
   c->id = COMPONENT_MESH;
   c->Size = Size;
-  c->Start = Start;
 
   m->fs = 0;
   m->vs = 0;

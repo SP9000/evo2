@@ -9,6 +9,7 @@ enum
   COMPONENT_COMPONENTB
 };
 
+/*****************************************************************************/
 struct SystemA
 {
   struct tv_System sys;
@@ -19,21 +20,24 @@ static bool ImplementsA(struct tv_Entity *e)
 }
 static void UpdateA(struct tv_Entity *e)
 {
-  puts(" updating A");
+  printf(" updating entity %p\n", e);
 }
-struct SystemA * NewSysA()
+static void StartA(struct tv_Entity *e)
 {
-  struct tv_System *sys;
-  sys = malloc(sizeof(struct SystemA));
-  sys->Implements = ImplementsA;
-  sys->Update = UpdateA;
-  return sys;
+  printf(" starting entity %p\n", e);
+}
+void RegisterSystemA()
+{
+  const struct tv_System sys = {
+    .Start = StartA,
+    .Update = UpdateA,
+    .Implements = ImplementsA,
+    .type = TV_SYSTEM_START | TV_SYSTEM_UPDATE
+  };
+  tv_RegisterSystem(&sys);
 }
 
-static void StartA(struct tv_Component *c)
-{
-  puts(" starting A");
-}
+/*****************************************************************************/
 struct ComponentA
 {
   struct tv_Component c;
@@ -52,21 +56,16 @@ struct ComponentA * NewA()
   c = (struct tv_Component*)a;
 
   c->id = COMPONENT_COMPONENTA;
-  c->Start = StartA;
   c->Size = SizeA;
   return a;
 }
 
-/* b is a simple component for testing. */
+/*****************************************************************************/
 struct ComponentB
 {
   struct tv_Component c;
   int val;
 };
-static void StartB(struct tv_Component *c)
-{
-  puts(" starting B");
-}
 static size_t SizeB()
 {
   return sizeof(struct ComponentB);
@@ -80,11 +79,11 @@ struct ComponentB * NewB()
   c = (struct tv_Component*)b;
 
   c->id = COMPONENT_COMPONENTB;
-  c->Start = StartB;
   c->Size = SizeB;
   return b;
 }
 
+/*****************************************************************************/
 /* TestEntity tests the creation of an entity as well as the attachment, 
  * removal, and usage of components to it.
  */
@@ -97,10 +96,8 @@ bool TestEntity()
   puts("creating components...");
   a = NewA();
   b = NewB();
-
   puts("creating systems...");
-  tv_RegisterSystem(NewSysA());
-
+  RegisterSystemA();
   puts("creating entity...");
   e = tv_EntityNew("dog");
 
@@ -110,20 +107,19 @@ bool TestEntity()
   tv_EntityAdd(&e, (struct tv_Component*)a);
   tv_EntityAdd(&e, (struct tv_Component*)b);
   puts("starting...");
-  tv_EntityStart(e);
+  tv_SystemStart();
   puts("updating...");
-  tv_UpdateSystems();
-  puts("");
-
+  tv_SystemUpdate();
   puts("removing components...");
   tv_EntityRemove(&e, (struct tv_Component*)a);
   tv_EntityRemove(&e, (struct tv_Component*)b);
   puts("starting...");
-  tv_EntityStart(e);
+  tv_SystemStart();
   puts("updating...");
-  tv_UpdateSystems();
-  puts("");
+  tv_SystemUpdate();
 
+  puts("");
   puts("done");
+
   return true;
 }

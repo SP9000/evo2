@@ -1,10 +1,6 @@
 #include "transform.h"
 #include "enum.h"
 
-static void Start()
-{
-}
-
 static size_t Size()
 {
   return sizeof(struct Transform);
@@ -20,7 +16,6 @@ struct Transform * NewTransform()
 
   c->id     = COMPONENT_TRANSFORM;
   c->Size   = Size;
-  c->Start  = Start;
 
   t->pos     = tv_Vector3Zero;
   t->rot     = tv_Vector4Zero;
