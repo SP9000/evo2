@@ -28,7 +28,7 @@ static unsigned vertexSize(uint16_t fmt)
 }
 
 /* tv_NewMesh creates a new mesh pre-allocated with room for n vertices. */
-struct Mesh NewMesh(int format, int n)
+struct Mesh NewMesh(uint8_t format, uint16_t n)
 {
   struct Mesh mesh = {
     .size = sizeof(struct Mesh) + vertexSize(format) * n,

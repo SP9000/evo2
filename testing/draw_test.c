@@ -1,3 +1,4 @@
+#include "draw.h"
 #include "test.h"
 
 void TestDraw()

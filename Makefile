@@ -1,15 +1,15 @@
 PLATFORM = sdl
 LIBS  = -lm -lSDL2 -lglew -framework OpenGL
-INCLUDE = -I.
+INCLUDE = -I. -Icomponents -Isystems
 CFLAGS = -shared -Wall -fPIC
 
 SRC=$(wildcard *.c)
 TESTSRC=$(wildcard testing/*.c)
 BASECSRC=$(wildcard components/*.c) # base components for engine
-PLATSRC=$(wildcard platform/$(PLATFOMR)/*.c) # platform specific source
+PLATSRC=$(wildcard platform/$(PLATFORM)/*.c) # platform specific source
 
 libevo2.so: $(SRC) $(BASECSRC) $(PLATSRC)
-	gcc -o $@ $^ $(CFLAGS) $(PLATFORM) $(INCLUDE) $(LIBS)
+	gcc -o $@ $^ $(CFLAGS) $(INCLUDE) $(LIBS)
 
 test: $(TESTSRC) libevo2.so 
 	cd testing && $(MAKE)

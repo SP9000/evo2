@@ -1,5 +1,5 @@
 LIBS  = -levo2 -lSDL2 -framework OpenGL -lglew
-CFLAGS = -Wall -I.. -L..
+CFLAGS = -Wall -I.. -I../components -I../systems -L..
 
 SRC=$(wildcard *.c) 
 CSRC=$(wildcard ../components/*.c) 

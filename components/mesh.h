@@ -1,8 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "../entity.h"
-#include "../vector.h"
+#include "entity.h"
+#include "vector.h"
 
 /*
  * tv_AttrType is an enumeration of all recognized per-vertex attributes.
@@ -33,11 +33,11 @@ struct Mesh{
   TV_COMPONENT
   uint16_t numverts;   /* number of vertices in mesh */
   uint16_t reserved;   /* number of vertices mesh can hold */
-  uint16_t format;     /* OR of tv_AttrType's comprising the vertex */
+  uint8_t format;      /* OR of tv_AttrType's comprising the vertex */
   uint8_t  verts[];    /* vertices */
 };
 
-struct Mesh NewMesh(int, int);
+struct Mesh NewMesh(uint8_t format, uint16_t n);
 size_t MeshSize(struct Mesh*);
 void MeshAppend(struct Mesh*, void*);
 
