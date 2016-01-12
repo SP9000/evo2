@@ -1,5 +1,5 @@
 #include "test.h"
-#include "../sigslot.h"
+#include "sigslot.h"
 
 SIGNAL(TestSignal, int)
 SIGDEF(TestSignal)

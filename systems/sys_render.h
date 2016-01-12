@@ -1,7 +1,7 @@
 #ifndef SYS_RENDER_H
 #define SYS_RENDER_H
 
-#include "../system.h"
+#include "system.h"
 
 /* sys_Render is the system responsible for all drawing */
 struct sys_Render{

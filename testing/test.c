@@ -12,7 +12,6 @@ void Tests()
   /* put tests to run here. */
   puts("\nDoing entity test");
   puts("-----------------------------------------");
-  TestEntity();
 
   puts("\nDoing signal slot test");
   puts("-----------------------------------------");
@@ -25,10 +24,6 @@ void Tests()
   puts("\nDoing engine test");
   puts("-----------------------------------------");
   TestEngine();
-
-  puts("\nDoing component test");
-  puts("-----------------------------------------");
-  TestComponents();
 }
 
 int main()

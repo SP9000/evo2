@@ -1,20 +1,24 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include <GL/glew.h>
-#include "../entity.h"
-#include "../vector.h"
+#include "entity.h"
+#include "vector.h"
+
+/* Texture is a structure that holds info about a material's texture. */
+struct Texture{
+  uint32_t handle;  /* handle assigned to loaded textures. */
+};
 
 /* Material is a component that contains OpenGL handles for rendering. */
 struct Material{
-  struct tv_Component co;
-  GLuint program;
-  GLuint fs, vs, gs;
-  GLuint mvp; /* modelview-projection matrix uniform handle */
+  TV_COMPONENT
+  uint32_t ambient;
+  uint32_t diffuse;
+  uint32_t specularity;
+  uint32_t shininess;
+  struct Texture tex;
 };
 
-struct Mesh * NewMesh(int, int);
-void InitMesh(struct Mesh*, int, int);
-void MeshAppend(struct Mesh*, void*);
+struct Material NewMaterial(uint32_t, uint32_t, uint32_t, uint32_t);
 
 #endif

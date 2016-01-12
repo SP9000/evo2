@@ -1,20 +1,23 @@
-#include "../components/enum.h"
-#include "../components/render.h"
-#include "../components/transform.h"
+#include "components/enum.h"
+#include "components/transform.h"
+#include "components/material.h"
+#include "components/mesh.h"
 #include "sys_render.h"
 
 static bool Implements(struct tv_Entity *e)
 {
-  return tv_EntityGetComponent(e, COMPONENT_RENDER) != NULL &&
-    tv_EntityGetComponent(e, COMPONENT_TRANSFORM) != NULL;
+  return tv_EntityGetComponent(e, COMPONENT_MATERIAL) != NULL &&
+    tv_EntityGetComponent(e, COMPONENT_MESH) != NULL;
 }
 
-/* TODO: actually do what this should do*/
+/* TODO: */
 static void Update(struct tv_Entity *e)
 {
-  struct Render *r;
-  SDL_Rect renderQuad;
-  r = (struct Render*)tv_EntityGetComponent(e, COMPONENT_RENDER);
+  struct Mesh *mesh;
+  struct Material *mat;
+
+  mesh = tv_EntityGetComponent(e, COMPONENT_MESH);
+  mat = tv_EntityGetComponent(e, COMPONENT_MATERIAL);
 }
 
 struct sys_Render * NewRenderSystem()

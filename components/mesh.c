@@ -2,92 +2,52 @@
 #include "../components/enum.h"
 #include "mesh.h"
 
-/* Size returns the size of the Mesh component */
-static size_t Size()
+/* vertexSize returns the size of each vertex in the mesh m. */
+static unsigned vertexSize(uint16_t fmt)
 {
-  return sizeof(struct Mesh);
-}
-
-/* InitMesh initializes the allocated mesh with room for n vertices. */
-void InitMesh(struct Mesh *m, int format, int n)
-{
-  int i, sz;
+  int i, size;
   /* calculate the vertex size */
-  for(i=TV_VERTEX_ATTR_START, sz=0; i < TV_VERTEX_ATTR_END; i<<=1)
-  {
-    if((format & i) == 0)
-    {
+  for(i=TV_VERTEX_ATTR_START, size=0; i < TV_VERTEX_ATTR_END; i<<=1){
+    if((fmt & i) == 0)
       continue;
-    }
-    switch(i)
-    {
+    switch(i){
       case TV_VERTEX_ATTR_POS:
-        sz += sizeof(struct tv_AttrPos);
+        size += sizeof(struct tv_AttrPos);
         break;
       case TV_VERTEX_ATTR_COL:
-        sz += sizeof(struct tv_AttrCol);
+        size += sizeof(struct tv_AttrCol);
         break;
       case TV_VERTEX_ATTR_UV:
-        sz += sizeof(struct tv_AttrTexco);
+        size += sizeof(struct tv_AttrTexco);
         break;
       default:
         break;
     }
   }
-  m->vertices = malloc(sz*n);
+  return size;
 }
 
 /* tv_NewMesh creates a new mesh pre-allocated with room for n vertices. */
-struct Mesh * NewMesh(int format, int n)
+struct Mesh NewMesh(int format, int n)
 {
-  struct Mesh *m;
-  struct tv_Component *c;
-
-  m = malloc(sizeof(struct Mesh));
-  InitMesh(m, format, n);
-
-  c = (struct tv_Component*)m;
-  c->id = COMPONENT_MESH;
-  c->Size = Size;
-
-  return m;
+  struct Mesh mesh = {
+    .size = sizeof(struct Mesh) + vertexSize(format) * n,
+    .format = format,
+    .numverts = n,
+  };
+  return mesh;
 }
 
 /* MeshAppend appends vtx to the mesh. */
-void MeshAppend(struct Mesh *mesh, void *vtx)
+void MeshAppend(struct Mesh *m, void *vtx)
 {
-  int i, sz;
-  void *v;
-  
-  if(mesh->numVertices == mesh->allocSize)
-  {
-    mesh->vertices = realloc(mesh->vertices, mesh->numVertices + 100);
-    mesh->allocSize = mesh->numVertices + 100;
-  }
+  uint16_t size;
+  uint8_t *dst;
 
-  for(i=TV_VERTEX_ATTR_START, v=mesh->vertices; i < TV_VERTEX_ATTR_END;
-     i<<=1, v+=sz)
-  {
-    sz = 0;
-    if((mesh->format & i) == 0)
-    {
-      continue;
-    }
-    switch(i)
-    {
-      case TV_VERTEX_ATTR_POS:
-        sz += sizeof(struct tv_AttrPos);
-        break;
-      case TV_VERTEX_ATTR_COL:
-        sz += sizeof(struct tv_AttrCol);
-        break;
-      case TV_VERTEX_ATTR_UV:
-        sz += sizeof(struct tv_AttrTexco);
-        break;
-      default:
-        break;
-    }
-    memcpy(v, vtx, sz);
-  }
-  mesh->numVertices++;
+  if(m->numverts >= m->reserved)
+    return;
+  size = vertexSize(m->format);
+  dst = m->verts + (size * m->numverts);
+  memcpy(dst, vtx, size);
+  m->numverts++;
 }

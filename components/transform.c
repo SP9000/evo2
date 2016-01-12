@@ -1,28 +1,18 @@
 #include "transform.h"
 #include "enum.h"
 
-static size_t Size()
+struct Transform NewTransform()
 {
-  return sizeof(struct Transform);
-}
-
-struct Transform * NewTransform()
-{
-  struct Transform *t;
-  struct tv_Component *c;
-
-  t = malloc(sizeof(struct Transform));
-  c = (struct tv_Component*)t;
-
-  c->id     = COMPONENT_TRANSFORM;
-  c->Size   = Size;
-
-  t->pos     = tv_Vector3Zero;
-  t->rot     = tv_Vector4Zero;
-  t->scale.x = 1.0f;
-  t->scale.y = 1.0f;
-  t->scale.z = 1.0f;
-
+  struct Transform t = {
+    .size =  sizeof(struct Transform),
+    .pos = tv_Vector3Zero,
+    .rot = tv_Vector4Zero,
+    .scale = {
+      .x = 1,
+      .y = 1,
+      .z = 1
+    }
+  };
   return t;
 }
 

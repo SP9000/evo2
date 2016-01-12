@@ -1,22 +1,15 @@
 #include "test.h"
-#include "../draw.h"
 
 void TestDraw()
 {
-  SDL_Renderer *renderer;
-  SDL_Rect rect;
-
+  test_puts(" initializing...");
   tv_DrawInit();
-  rect.x = 10;
-  rect.y = 10;
-  rect.w = 100;
-  rect.h = 100;
 
-  puts("beginning frame...");
+  test_puts("beginning frame...");
   tv_DrawStartFrame();
-  puts("finishing frame...");
+  test_puts("finishing frame...");
   tv_DrawEndFrame();
 
-  puts("\ndone");
+  test_puts("\ndone");
   tv_DrawQuit();
 }

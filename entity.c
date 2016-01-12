@@ -1,66 +1,92 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "components/enum.h"
 #include "entity.h"
 
 #define MAX_ENTITIES 10000
 
 static struct tv_Entity *entities[MAX_ENTITIES];
-static int numEntities;
+static int numentities;
 
-/* tv_EntityNew creates a new entity named name. */
-struct tv_Entity * tv_EntityNew(const char *name)
+/* entitysize returns the size of e in bytes. */
+static int entitysize(struct tv_Entity *e)
 {
-  struct tv_Entity *e = (struct tv_Entity*)malloc(sizeof(struct tv_Entity));
-  strncpy(e->name, name, 31);
-  e->_numComponents = 0;
+  int i, size;
+  for(i = 0, size = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
+    if(e->components[i] == COMPONENT_END)
+      break;
+    size += (tv_Component)(e->data[size]);
+  }
+  return size + sizeof(struct tv_Entity);
+}
 
-  entities[numEntities] = e;
-  numEntities++;
+/* tv_EntityNew copies e into the engine. */
+struct tv_Entity * tv_EntityNew(struct tv_Entity *e)
+{
+  int size;
+  struct tv_Entity *ret;
 
-  return e;
+  size = entitysize(e);
+  ret = malloc(size);
+  memcpy(ret, e, size);
+  entities[numentities] = ret;
+  numentities++;
+  return ret;
 }
 
 /* tv_EntityDestroy destroys an entity and all its components. */
 void tv_EntityDestroy(struct tv_Entity *e)
 {
   int i;
-  for(i = numEntities-1; i >= 0; --i){
+  for(i = numentities-1; i >= 0; --i){
     if(entities[i] == e){
       entities[i] = NULL;
-      numEntities--;
+      numentities--;
+      free(e);
+      break;
     }
   }
 }
 
 /* tv_EntityAdd attaches the component c to e. */
-void tv_EntityAdd(struct tv_Entity **e, struct tv_Component *c)
+struct tv_Entity * tv_EntityAdd(struct tv_Entity *e, uint16_t id, tv_Component *c)
 {
-  (*e) = realloc(*e, sizeof(struct tv_Entity) +
-      sizeof(struct tv_Component*) * ((*e)->_numComponents + 1));
-  (*e)->components[(*e)->_numComponents] = c;
-  (*e)->_numComponents++;
-}
+  int i;
 
-/* tv_EntityRemove removes the component c from e. */
-void tv_EntityRemove(struct tv_Entity **e, struct tv_Component *c)
-{
-  unsigned i, end;
-  bool found;
+  for(i = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
+    if(e->components[i] == COMPONENT_END){
+      uint16_t newsize;
+      newsize = entitysize(e) + *c;
 
-  end = (*e)->_numComponents;
-  for(i = 0, found = false; i < end; ++i) {
-    if(found || (*e)->components[i] == c){
-      found = true;
-      if(i < end) 
-        (*e)->components[i] = (*e)->components[i+1];
+      e->components[i] = id;
+      e = realloc(e, newsize);
+      memcpy(e->data + newsize, c, *c);
+      break;
     }
   }
-  if(found){
-    *e = realloc(*e, sizeof(struct tv_Entity) + 
-        sizeof(struct tv_Component) * ((*e)->_numComponents - 1));
-    (*e)->_numComponents--;
+  return e;
+}
+
+/* tv_EntityRemove removes the component of type id from e. */
+struct tv_Entity * tv_EntityRemove(struct tv_Entity *e, uint16_t id)
+{
+  unsigned i;
+  bool found;
+  for(i = 0, found = false; i < TV_ENTITY_MAX_COMPONENTS; ++i){
+    if(found && i < TV_ENTITY_MAX_COMPONENTS-1)
+      e->components[i] = e->components[i+1];
+    else if(found)
+      e->components[i] = TV_ENTITY_MAX_COMPONENTS;
+    else if(e->components[i] == id)
+      found = true;
   }
+  if(i < TV_ENTITY_MAX_COMPONENTS){
+    uint16_t newsize;
+    newsize = entitysize(e);
+    e = realloc(e, newsize);
+  }
+  return e;
 }
 
 /* tv_EntityStartAll runs start on all entities for which test is true. */
@@ -68,7 +94,7 @@ void tv_EntityStartAll(bool (*test)(struct tv_Entity*),
     void (*start)(struct tv_Entity *))
 {
   unsigned i;
-  for(i = 0; i < numEntities; ++i){
+  for(i = 0; i < numentities; ++i){
     if(test(entities[i]))
       start(entities[i]);
   }
@@ -79,33 +105,21 @@ void tv_EntityUpdateAll(bool (*test)(struct tv_Entity*),
     void (*update)(struct tv_Entity *))
 {
   unsigned i;
-  for(i = 0; i < numEntities; ++i){
+  for(i = 0; i < numentities; ++i){
     if(test(entities[i]))
       update(entities[i]);
   }
 }
 
-
-/* tv_EntityCopy performs a deep copy of e and returns a pointer to the copy. */
-struct tv_Entity * tv_EntityCopy(struct tv_Entity *e)
-{
-  unsigned i;
-  struct tv_Entity* ret;
-
-  ret = malloc(sizeof(struct tv_Entity));
-  for(i = 0; i < e->_numComponents; ++i)
-    ret->components[i] = malloc(e->components[i]->Size());
-  return ret;
-}
-
 /* tv_EntityGetComponent returns e's component of type id - NULL if none. */
-struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id)
+tv_Component * tv_EntityGetComponent(struct tv_Entity *e, uint16_t id)
 {
-  unsigned i;
-  for(i = 0; i < e->_numComponents; ++i)
+  unsigned i, offset;
+  for(i = 0, offset = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i)
   {
-    if(e->components[i]->id == id)
-      return e->components[i];
+    if(e->components[i] == id)
+      return (tv_Component*)(e->data + offset);
+    offset += (tv_Component)(e->data[offset]);
   }
   return NULL;
 }
@@ -113,6 +127,10 @@ struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, unsigned id)
 /* tv_EntityNumComponents returns the number of components attached to e. */
 unsigned tv_EntityNumComponents(struct tv_Entity *e)
 {
-  return e->_numComponents;
+  unsigned i;
+  for(i = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
+    if(e->components[i] == TV_ENTITY_MAX_COMPONENTS)
+      return i;
+  }
+  return TV_ENTITY_MAX_COMPONENTS;
 }
-

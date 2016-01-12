@@ -30,16 +30,15 @@ struct tv_AttrTexco{
 
 /* Mesh is a component that contains vertex data. */
 struct Mesh{
-  struct tv_Component co;
-  int format; /* OR of tv_AttrType's comprising the vertex */
-  int vertexSize; /* size of each vertex (in bytes) */
-  int numVertices;
-  int allocSize; /* the number of vertices that will fit before reallocation */
-  void *vertices;
+  TV_COMPONENT
+  uint16_t numverts;   /* number of vertices in mesh */
+  uint16_t reserved;   /* number of vertices mesh can hold */
+  uint16_t format;     /* OR of tv_AttrType's comprising the vertex */
+  uint8_t  verts[];    /* vertices */
 };
 
-struct Mesh * NewMesh(int, int);
-void InitMesh(struct Mesh*, int, int);
+struct Mesh NewMesh(int, int);
+size_t MeshSize(struct Mesh*);
 void MeshAppend(struct Mesh*, void*);
 
 #endif
