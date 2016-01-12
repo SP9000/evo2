@@ -29,7 +29,7 @@ struct tv_Entity * tv_EntityRemove(struct tv_Entity*, uint16_t);
 void tv_EntityStartAll(bool (*test)(struct tv_Entity*),
     void (*start)(struct tv_Entity*));
 void tv_EntityUpdateAll(bool (*test)(struct tv_Entity*),
-    void (*update)(struct tv_Entity*));
+    void (*update)(struct tv_Entity*), struct tv_Entity**);
 
 unsigned tv_EntityNumComponents(struct tv_Entity*);
 tv_Component * tv_EntityGetComponent(struct tv_Entity*, uint16_t);

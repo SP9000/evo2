@@ -19,6 +19,8 @@ enum{
   COMPONENT_MATERIAL,
   COMPONENT_PARTICLES,
 
+  COMPONENT_GUITEXT,
+
   COMPONENT_END /* must be at end - end of component enumeration */
 };
 

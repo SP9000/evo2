@@ -3,6 +3,7 @@
 #include <string.h>
 #include "components/enum.h"
 #include "entity.h"
+#include "system.h"
 
 #define MAX_ENTITIES 10000
 
@@ -102,13 +103,25 @@ void tv_EntityStartAll(bool (*test)(struct tv_Entity*),
 
 /* tv_EntityUpdateAll runs update on all entities for which test is true. */
 void tv_EntityUpdateAll(bool (*test)(struct tv_Entity*), 
-    void (*update)(struct tv_Entity *))
+    void (*update)(struct tv_Entity *), struct tv_Entity **cache)
 {
-  unsigned i;
-  for(i = 0; i < numentities; ++i){
-    if(test(entities[i]))
-      update(entities[i]);
+  unsigned i, updated;
+
+  for(i = 0; i < TV_SYSTEM_CACHE_SIZE; ++i){
+    if(cache[i] == NULL)
+      break;
+    update(cache[i]);
   }
+
+  for(i = 0, updated = 0; i < numentities; ++i){
+    if(test(entities[i])){
+      update(entities[i]);
+      if(updated < TV_SYSTEM_CACHE_SIZE)
+        cache[updated++] = entities[i];
+    }
+  }
+  if(updated < TV_SYSTEM_CACHE_SIZE)
+    cache[updated] = NULL;
 }
 
 /* tv_EntityGetComponent returns e's component of type id - NULL if none. */

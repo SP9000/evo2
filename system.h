@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include "entity.h"
 
+#define TV_SYSTEM_CACHE_SIZE 32
+
 /**
  * tv_System is a struct containing the information of a "system".
  * Systems either initialize components, update components (each frame) by
@@ -15,11 +17,8 @@ struct tv_System{
   void (*Start)(struct tv_Entity*);      /* starts components (run-once). */
   void (*Update)(struct tv_Entity*);     /* updates an entity per-frame. */
   bool (*Implements)(struct tv_Entity*); /* true- entity implements system. */
-  enum{
-    TV_SYSTEM_NONE = 0,
-    TV_SYSTEM_START = 1<<0,  /* system runs on components as they're added. */
-    TV_SYSTEM_UPDATE = 1<<1, /* system runs on components each frame. */
-  }type;
+  void (*GlobalUpdate)();                /* run once per system per frame. */
+  struct tv_Entity *cache[TV_SYSTEM_CACHE_SIZE]; /* cache of recent entities. */
 };
 
 enum{
