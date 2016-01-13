@@ -1,7 +1,7 @@
 PLATFORM = sdl
 LIBS  = -lm -lSDL2 -lglew -framework OpenGL
 INCLUDE = -I. -Icomponents -Isystems
-CFLAGS = -shared -Wall -fPIC
+CFLAGS = -shared -Wall -fPIC --std=c11
 
 SRC=$(wildcard *.c)
 TESTSRC=$(wildcard testing/*.c)

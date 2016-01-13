@@ -11,7 +11,10 @@
 /* TV_COMPONENT is a macro that embeds component data into a struct. 
  * This macro must be the first declaration within a component structure.
  */
-#define TV_COMPONENT uint16_t size;
+#define TV_COMPONENT \
+  uint16_t size; \
+  void (*init)(void*);
+
 typedef uint16_t tv_Component;
 
 /* tv_Entity is the basic container of all entities in the engine. */

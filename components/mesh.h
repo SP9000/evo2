@@ -18,27 +18,47 @@ enum tv_AttrType{
   TV_VERTEX_ATTR_END=1<<3
 };
 
-struct tv_AttrPos{
-  tv_Vector3 xyz;
-};
-struct tv_AttrCol{
-  tv_Vector3 rgb;
-};
-struct tv_AttrTexco{
-  tv_Vector2 uv;
+/* MeshPos is a struct that represents an XYZW vertex position. */
+struct MeshPos{
+  uint8_t x, y, z, w;
 };
 
-/* Mesh is a component that contains vertex data. */
+/* MeshCol is a struct that represents an RGBA vertex color. */
+struct MeshCol{
+  uint8_t r, g, b, a;
+};
+
+/* MeshTexco is a struct that represents a 2D texture coordinate. */
+struct MeshTexco{
+  uint16_t u, v;
+};
+
+/* MeshAttr is a union representing one 1 attribute for 1 vertex. */
+struct MeshAttr{
+  union{
+    struct MeshPos pos;
+    struct MeshCol col;
+    struct MeshTexco texco;
+  };
+};
+
+/* MeshBuffer is a struct that holds per-vertex data for 1 attribute. */
+struct MeshBuffer{
+  uint8_t type;
+  struct MeshAttr data[];
+};
+
+/* Mesh is a component that all associated buffers needed to render geometry. */
 struct Mesh{
   TV_COMPONENT
-  uint16_t numverts;   /* number of vertices in mesh */
-  uint16_t reserved;   /* number of vertices mesh can hold */
-  uint8_t format;      /* OR of tv_AttrType's comprising the vertex */
-  uint8_t  verts[];    /* vertices */
+  uint16_t numVerts;
+  uint8_t numBuffs;
+  struct MeshBuffer buffers[];
 };
 
-struct Mesh NewMesh(uint8_t format, uint16_t n);
+struct Mesh NewMesh(uint16_t, uint16_t);
 size_t MeshSize(struct Mesh*);
-void MeshAppend(struct Mesh*, void*);
+
+struct Mesh NewMeshQuad(uint16_t);
 
 #endif

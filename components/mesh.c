@@ -1,53 +1,61 @@
 #include <string.h>
-#include "../components/enum.h"
+#include "components/enum.h"
+#include "entity.h"
 #include "mesh.h"
 
-/* vertexSize returns the size of each vertex in the mesh m. */
-static unsigned vertexSize(uint16_t fmt)
+/* makeQuad initializes the mesh component c to a simple white quad. */
+static void makeQuad(void *c)
 {
-  int i, size;
-  /* calculate the vertex size */
-  for(i=TV_VERTEX_ATTR_START, size=0; i < TV_VERTEX_ATTR_END; i<<=1){
-    if((fmt & i) == 0)
-      continue;
-    switch(i){
-      case TV_VERTEX_ATTR_POS:
-        size += sizeof(struct tv_AttrPos);
-        break;
-      case TV_VERTEX_ATTR_COL:
-        size += sizeof(struct tv_AttrCol);
-        break;
-      case TV_VERTEX_ATTR_UV:
-        size += sizeof(struct tv_AttrTexco);
-        break;
-      default:
-        break;
-    }
-  }
-  return size;
-}
+  struct Mesh *m;
+  struct MeshBuffer *vb, *cb;
+  const struct MeshAttr pos[] = {
+    {.pos = {0,0,0,1}},
+    {.pos = {1,0,0,1}},
+    {.pos = {1,1,0,1}},
+
+    {.pos = {0,0,0,1}},
+    {.pos = {1,1,0,1}},
+    {.pos = {0,1,0,1}}
+  };
+  const struct MeshAttr col[] = {
+    {.col = {0xff,0xff,0xff,0xf}},
+    {.col = {0xff,0xff,0xff,0xf}},
+    {.col = {0xff,0xff,0xff,0xf}},
+
+    {.col = {0xff,0xff,0xff,0xf}},
+    {.col = {0xff,0xff,0xff,0xf}},
+    {.col = {0xff,0xff,0xff,0xf}}
+  };
+
+  m = (struct Mesh*)c;
+  cb = (struct MeshBuffer*)m->buffers;
+  vb = (struct MeshBuffer*)m->buffers + sizeof(pos);
+
+  vb->type = TV_VERTEX_ATTR_POS;
+  cb->type = TV_VERTEX_ATTR_COL;
+  memcpy(vb, pos, sizeof(pos));
+  memcpy(cb, col, sizeof(col));
+};
 
 /* tv_NewMesh creates a new mesh pre-allocated with room for n vertices. */
-struct Mesh NewMesh(uint8_t format, uint16_t n)
+struct Mesh NewMesh(uint16_t n, uint16_t buffs)
 {
   struct Mesh mesh = {
-    .size = sizeof(struct Mesh) + vertexSize(format) * n,
-    .format = format,
-    .numverts = n,
+    .size = sizeof(struct Mesh) + n * sizeof(struct MeshAttr) * buffs,
+    .numVerts = n,
+    .numBuffs = 0
   };
   return mesh;
 }
 
-/* MeshAppend appends vtx to the mesh. */
-void MeshAppend(struct Mesh *m, void *vtx)
+/* MeshNewQuad creates returns a new mesh of a white qud. */
+struct Mesh MeshNewQuad()
 {
-  uint16_t size;
-  uint8_t *dst;
-
-  if(m->numverts >= m->reserved)
-    return;
-  size = vertexSize(m->format);
-  dst = m->verts + (size * m->numverts);
-  memcpy(dst, vtx, size);
-  m->numverts++;
+  struct Mesh mesh = {
+    .size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
+    .numVerts = 6,
+    .numBuffs = 0,
+    .init = makeQuad
+  };
+  return mesh;
 }
