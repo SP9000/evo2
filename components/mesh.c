@@ -41,7 +41,9 @@ static void makeQuad(void *c)
 struct Mesh NewMesh(uint16_t n, uint16_t buffs)
 {
   struct Mesh mesh = {
-    .size = sizeof(struct Mesh) + n * sizeof(struct MeshAttr) * buffs,
+    .C = {
+      .size = sizeof(struct Mesh) + n * sizeof(struct MeshAttr) * buffs,
+    },
     .numVerts = n,
     .numBuffs = 0
   };
@@ -52,10 +54,12 @@ struct Mesh NewMesh(uint16_t n, uint16_t buffs)
 struct Mesh MeshNewQuad()
 {
   struct Mesh mesh = {
-    .size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
+    .C = {
+      .size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
+      .init = makeQuad
+    },
     .numVerts = 6,
     .numBuffs = 0,
-    .init = makeQuad
   };
   return mesh;
 }

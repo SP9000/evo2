@@ -4,7 +4,9 @@
 struct Transform NewTransform()
 {
   struct Transform t = {
-    .size =  sizeof(struct Transform),
+    .C = {
+      .size =  sizeof(struct Transform),
+    },
     .pos = tv_Vector3Zero,
     .rot = tv_Vector4Zero,
     .scale = {

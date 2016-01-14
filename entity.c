@@ -17,7 +17,7 @@ static int entitysize(struct tv_Entity *e)
   for(i = 0, size = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
     if(e->components[i] == COMPONENT_END)
       break;
-    size += (tv_Component)(e->data[size]);
+    size += ((struct tv_Component*)(e->data + size))->size;
   }
   return size + sizeof(struct tv_Entity);
 }
@@ -51,18 +51,19 @@ void tv_EntityDestroy(struct tv_Entity *e)
 }
 
 /* tv_EntityAdd attaches the component c to e. */
-struct tv_Entity * tv_EntityAdd(struct tv_Entity *e, uint16_t id, tv_Component *c)
+struct tv_Entity * tv_EntityAdd(struct tv_Entity *e, uint16_t id,
+    struct tv_Component *c)
 {
   int i;
 
   for(i = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
     if(e->components[i] == COMPONENT_END){
       uint16_t newsize;
-      newsize = entitysize(e) + *c;
+      newsize = entitysize(e) + c->size;
 
       e->components[i] = id;
       e = realloc(e, newsize);
-      memcpy(e->data + newsize, c, *c);
+      memcpy(e->data + newsize, c, c->size);
       break;
     }
   }
@@ -88,6 +89,16 @@ struct tv_Entity * tv_EntityRemove(struct tv_Entity *e, uint16_t id)
     e = realloc(e, newsize);
   }
   return e;
+}
+
+/* tv_EntityInit executes all of e's component's init callbacks. */
+void tv_EntityInit(struct tv_Entity *e)
+{
+  unsigned i;
+  for(i = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
+    if(e->components[i] != COMPONENT_END){
+    }
+  }
 }
 
 /* tv_EntityStartAll runs start on all entities for which test is true. */
@@ -125,14 +136,14 @@ void tv_EntityUpdateAll(bool (*test)(struct tv_Entity*),
 }
 
 /* tv_EntityGetComponent returns e's component of type id - NULL if none. */
-tv_Component * tv_EntityGetComponent(struct tv_Entity *e, uint16_t id)
+struct tv_Component * tv_EntityGetComponent(struct tv_Entity *e, uint16_t id)
 {
   unsigned i, offset;
   for(i = 0, offset = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i)
   {
     if(e->components[i] == id)
-      return (tv_Component*)(e->data + offset);
-    offset += (tv_Component)(e->data[offset]);
+      return (struct tv_Component*)(e->data + offset);
+    offset += ((struct tv_Component*)(e->data + offset))->size;
   }
   return NULL;
 }
