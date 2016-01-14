@@ -50,7 +50,7 @@ void tv_EntityDestroy(struct tv_Entity *e)
   }
 }
 
-/* tv_EntityAdd attaches the component c to e. */
+/* tv_EntityAdd attaches the component c to e and initializes c. */
 struct tv_Entity * tv_EntityAdd(struct tv_Entity *e, uint16_t id,
     struct tv_Component *c)
 {
@@ -64,6 +64,7 @@ struct tv_Entity * tv_EntityAdd(struct tv_Entity *e, uint16_t id,
       e->components[i] = id;
       e = realloc(e, newsize);
       memcpy(e->data + newsize, c, c->size);
+      c->init(e->data + newsize);
       break;
     }
   }
@@ -79,7 +80,7 @@ struct tv_Entity * tv_EntityRemove(struct tv_Entity *e, uint16_t id)
     if(found && i < TV_ENTITY_MAX_COMPONENTS-1)
       e->components[i] = e->components[i+1];
     else if(found)
-      e->components[i] = TV_ENTITY_MAX_COMPONENTS;
+      e->components[i] = COMPONENT_END;
     else if(e->components[i] == id)
       found = true;
   }
@@ -89,16 +90,6 @@ struct tv_Entity * tv_EntityRemove(struct tv_Entity *e, uint16_t id)
     e = realloc(e, newsize);
   }
   return e;
-}
-
-/* tv_EntityInit executes all of e's component's init callbacks. */
-void tv_EntityInit(struct tv_Entity *e)
-{
-  unsigned i;
-  for(i = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
-    if(e->components[i] != COMPONENT_END){
-    }
-  }
 }
 
 /* tv_EntityStartAll runs start on all entities for which test is true. */
