@@ -1,6 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -27,7 +28,7 @@ struct tv_Entity
   uint8_t data[]; /* the component data. */
 };
 
-struct tv_Entity * tv_EntityNew(struct tv_Entity*);
+struct tv_Entity * tv_EntityNew(int, ...);
 void tv_EntityDestroy(struct tv_Entity*);
 struct tv_Entity * tv_EntityAdd(struct tv_Entity*, uint16_t, struct tv_Component*);
 struct tv_Entity * tv_EntityRemove(struct tv_Entity*, uint16_t);

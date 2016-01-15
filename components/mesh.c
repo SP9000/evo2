@@ -9,32 +9,35 @@ static void makeQuad(void *c)
   struct Mesh *m;
   struct MeshBuffer *vb, *cb;
   const struct MeshAttr pos[] = {
-    {.pos = {0,0,0,1}},
-    {.pos = {1,0,0,1}},
-    {.pos = {1,1,0,1}},
+    {.pos = {0,0,0,255}},
+    {.pos = {255,0,0,255}},
+    {.pos = {255,255,0,255}},
 
-    {.pos = {0,0,0,1}},
-    {.pos = {1,1,0,1}},
-    {.pos = {0,1,0,1}}
+    {.pos = {0,0,0,255}},
+    {.pos = {255,255,0,255}},
+    {.pos = {0,255,0,255}}
   };
   const struct MeshAttr col[] = {
-    {.col = {0xff,0xff,0xff,0xf}},
-    {.col = {0xff,0xff,0xff,0xf}},
-    {.col = {0xff,0xff,0xff,0xf}},
+    {.col = {0xff,0xff,0xff,0xff}},
+    {.col = {0xff,0xff,0xff,0xff}},
+    {.col = {0xff,0xff,0xff,0xff}},
 
-    {.col = {0xff,0xff,0xff,0xf}},
-    {.col = {0xff,0xff,0xff,0xf}},
-    {.col = {0xff,0xff,0xff,0xf}}
+    {.col = {0xff,0xff,0xff,0xff}},
+    {.col = {0xff,0xff,0xff,0xff}},
+    {.col = {0xff,0xff,0xff,0xff}}
   };
 
   m = (struct Mesh*)c;
-  cb = (struct MeshBuffer*)m->buffers;
-  vb = (struct MeshBuffer*)m->buffers + sizeof(pos);
+  vb = (struct MeshBuffer*)(m->buffers);
+  cb = (struct MeshBuffer*)(m->buffers + sizeof(pos));
 
   vb->type = TV_VERTEX_ATTR_POS;
   cb->type = TV_VERTEX_ATTR_COL;
   memcpy(vb, pos, sizeof(pos));
   memcpy(cb, col, sizeof(col));
+
+  for(int i = 0; i < 4*6; ++i)
+    printf("%d\n", *((uint8_t*)(cb) + i));
 };
 
 /* tv_NewMesh creates a new mesh pre-allocated with room for n vertices. */

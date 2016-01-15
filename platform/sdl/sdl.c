@@ -3,18 +3,39 @@
 #include <GL/glew.h>
 #include "debug.h"
 #include "draw.h"
+#include "matrix.h"
 
-static SDL_Window *win;
-static SDL_GLContext *glCtx;
+static SDL_Window *win; /* SDL window to render to. */
+static SDL_GLContext *glCtx; /* OpenGL context. */
+static struct Mat4x4 mvpMat; /* the main modelview-projection matrix to render with. */
 
 /* vertexShader is the vertex shader used for all rendering. */
 GLchar const *vertexShader[] = {
-  ""
+    "#version 150\n"
+    "in vec4 pos;\n"
+    "in vec4 col;\n"
+    "out vec4 out_col;\n"
+    "uniform sampler2D tex;\n"
+    "uniform mat4 mvp;\n"
+    "void main()\n"
+    "{\n"
+    "  out_col = col;\n"
+    "  gl_Position = mvp * pos;\n"
+    "}\n"
 };
-/* fragment is the fragment shader used for all rendering. */
+
+/* fragmentShader is the fragment shader used for all rendering. */
 GLchar const *fragmentShader[] = {
-  ""
+    "#version 150\n"
+    "in vec4 out_col;\n"
+    "out vec4 out_color;\n"
+    "uniform sampler2D tex;\n"
+    "void main()\n"
+    "{\n"
+    "  out_color = out_col;\n"
+    "}\n"
 };
+
 static GLuint program;  /* the shader program. */
 static GLuint mvp;      /* the modelview matrix uniform handle. */
 
@@ -87,6 +108,10 @@ static bool initShader()
     }
     /* get the modelview-projection matrix uniform */
     mvp = glGetUniformLocation(program, "mvp");
+    if(mvp == -1){
+      debug_puts("error: no \"mvp\" uniform found in shader program");
+      return false;
+    }
   }
   glUseProgram(program);
   return true;
@@ -132,6 +157,10 @@ int tv_DrawInit()
     debug_puts("error: shader");
     return -5;
   }
+  glViewport(0,0,640,480);
+
+  mat4x4_perspective(&mvpMat, 45.0f, 640.0f/480.0f, 0.01f, 100.0f);
+  mat4x4_translate(&mvpMat, 0.0f, 0.0f, -6.0f);
   return 0;
 }
 
@@ -144,11 +173,64 @@ void tv_DrawQuit()
 /* tv_DrawStartFrame prepares for rendering a new frame. */
 void tv_DrawStartFrame()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
 }
 
 /*  tv_DrawEndFrame is called when all rendering for the current frame is done. */
 void tv_DrawEndFrame()
 {
   SDL_GL_SwapWindow(win);
+}
+
+/* tv_Draw draws the given mesh with the given material. */
+void tv_Draw(struct Mesh *mesh, struct Material *mat)
+{
+  struct{
+    GLuint pos, col;
+  }buffs;
+  struct{
+    GLuint pos, col;
+  }attrs;
+  uint8_t *vb, *cb;
+  GLuint vao;
+
+  vb = mesh->buffers;
+  cb = vb + sizeof(struct MeshAttr) * mesh->numVerts;
+ 
+  //XXX: store vbo's in table (don't rebuffer each frame)
+  glGenBuffers(1, &buffs.pos);
+  glGenBuffers(1, &buffs.col);
+  glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(struct MeshAttr) * mesh->numVerts,
+      vb, GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, buffs.col);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(struct MeshAttr) * mesh->numVerts,
+      cb, GL_STATIC_DRAW);
+
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  //XXX: same with attributes
+  attrs.pos = glGetAttribLocation(program, "pos");
+  if(attrs.pos == -1)
+    debug_puts("error: could not find attribute \"pos\" in shader program.");
+  attrs.col = glGetAttribLocation(program, "col");
+  if(attrs.col == -1)
+    debug_puts("error: could not find attribute \"col\" in shader program.");
+
+  glUniformMatrix4fv(mvp, 1, GL_FALSE, mat4x4_to_array(&mvpMat));
+  glEnableVertexAttribArray(attrs.pos);
+  glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
+  glVertexAttribPointer(attrs.pos, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+
+  glEnableVertexAttribArray(attrs.col);
+  glBindBuffer(GL_ARRAY_BUFFER, buffs.col);
+  glVertexAttribPointer(attrs.col, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+
+  glDrawArrays(GL_TRIANGLES, 0, mesh->numVerts);
+  glBindVertexArray(0);
+
+  glDeleteBuffers(1, &buffs.pos);
+  glDeleteBuffers(1, &buffs.col);
+  glDeleteVertexArrays(1, &vao);
 }

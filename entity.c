@@ -10,30 +10,40 @@
 static struct tv_Entity *entities[MAX_ENTITIES];
 static int numentities;
 
-/* entitysize returns the size of e in bytes. */
-static int entitysize(struct tv_Entity *e)
-{
-  int i, size;
-  for(i = 0, size = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
-    if(e->components[i] == COMPONENT_END)
-      break;
-    size += ((struct tv_Component*)(e->data + size))->size;
-  }
-  return size + sizeof(struct tv_Entity);
-}
-
 /* tv_EntityNew copies e into the engine. */
-struct tv_Entity * tv_EntityNew(struct tv_Entity *e)
+struct tv_Entity * tv_EntityNew(int count, ...)
 {
-  int size;
-  struct tv_Entity *ret;
+  struct tv_Entity *e;
+  int i, numComponents, size;
+  va_list ap;
 
-  size = entitysize(e);
-  ret = malloc(size);
-  memcpy(ret, e, size);
-  entities[numentities] = ret;
+  uint16_t ids[TV_ENTITY_MAX_COMPONENTS] = {};
+  struct tv_Component *components[TV_ENTITY_MAX_COMPONENTS];
+
+  /* get components and total entity size */
+  va_start(ap, count);
+  for (i = 0, size = 0; i < count; ++i){
+    ids[i] = (uint16_t)va_arg(ap, int);
+    components[i] = va_arg(ap, struct tv_Component*);
+    size += components[i]->size;
+  }
+  va_end(ap);
+  numComponents = i;
+
+  /* allocate entity and copy/init component data */
+  e = malloc(size + sizeof(struct tv_Entity));
+  memcpy(e->components, ids, sizeof(ids));
+  for(i = 0, size = 0; i < numComponents; ++i){
+    struct tv_Component *c;
+    c = (struct tv_Component*)(e->data + size);
+    memcpy(c, components[i], components[i]->size);
+    if(c->init != NULL)
+      c->init(c);
+    size += components[i]->size;
+  }
+  entities[numentities] = e;
   numentities++;
-  return ret;
+  return e;
 }
 
 /* tv_EntityDestroy destroys an entity and all its components. */
@@ -48,48 +58,6 @@ void tv_EntityDestroy(struct tv_Entity *e)
       break;
     }
   }
-}
-
-/* tv_EntityAdd attaches the component c to e and initializes c. */
-struct tv_Entity * tv_EntityAdd(struct tv_Entity *e, uint16_t id,
-    struct tv_Component *c)
-{
-  int i;
-
-  for(i = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i){
-    if(e->components[i] == COMPONENT_END){
-      uint16_t newsize;
-      newsize = entitysize(e) + c->size;
-
-      e->components[i] = id;
-      e = realloc(e, newsize);
-      memcpy(e->data + newsize, c, c->size);
-      c->init(e->data + newsize);
-      break;
-    }
-  }
-  return e;
-}
-
-/* tv_EntityRemove removes the component of type id from e. */
-struct tv_Entity * tv_EntityRemove(struct tv_Entity *e, uint16_t id)
-{
-  unsigned i;
-  bool found;
-  for(i = 0, found = false; i < TV_ENTITY_MAX_COMPONENTS; ++i){
-    if(found && i < TV_ENTITY_MAX_COMPONENTS-1)
-      e->components[i] = e->components[i+1];
-    else if(found)
-      e->components[i] = COMPONENT_END;
-    else if(e->components[i] == id)
-      found = true;
-  }
-  if(i < TV_ENTITY_MAX_COMPONENTS){
-    uint16_t newsize;
-    newsize = entitysize(e);
-    e = realloc(e, newsize);
-  }
-  return e;
 }
 
 /* tv_EntityStartAll runs start on all entities for which test is true. */

@@ -53,12 +53,11 @@ struct Mesh{
   TV_COMPONENT
   uint16_t numVerts;
   uint8_t numBuffs;
-  struct MeshBuffer buffers[];
+  uint8_t buffers[];
 };
 
 struct Mesh NewMesh(uint16_t, uint16_t);
 size_t MeshSize(struct Mesh*);
-
-struct Mesh NewMeshQuad(uint16_t);
+struct Mesh MeshNewQuad();
 
 #endif
