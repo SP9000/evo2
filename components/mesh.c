@@ -35,9 +35,6 @@ static void makeQuad(void *c)
   cb->type = TV_VERTEX_ATTR_COL;
   memcpy(vb, pos, sizeof(pos));
   memcpy(cb, col, sizeof(col));
-
-  for(int i = 0; i < 4*6; ++i)
-    printf("%d\n", *((uint8_t*)(cb) + i));
 };
 
 /* tv_NewMesh creates a new mesh pre-allocated with room for n vertices. */
@@ -47,6 +44,7 @@ struct Mesh NewMesh(uint16_t n, uint16_t buffs)
     .C = {
       .size = sizeof(struct Mesh) + n * sizeof(struct MeshAttr) * buffs,
     },
+    .primitive = TV_VERTEX_PRIMITIVE_TRIANGLES,
     .numVerts = n,
     .numBuffs = 0
   };
@@ -61,6 +59,7 @@ struct Mesh MeshNewQuad()
       .size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
       .init = makeQuad
     },
+    .primitive = TV_VERTEX_PRIMITIVE_TRIANGLES,
     .numVerts = 6,
     .numBuffs = 0,
   };

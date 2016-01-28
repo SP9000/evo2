@@ -68,8 +68,8 @@ static void update(struct tv_Entity *e)
   }
 }
 
-/* NewParticlesSystem creates a new system to update particle emitters. */
-void NewParticlesSystem()
+/* InitParticlesSystem initializes the system that updates particle emitters. */
+void InitParticlesSystem()
 {
   struct tv_System sys = {
     .enabled = true,

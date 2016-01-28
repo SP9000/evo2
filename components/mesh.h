@@ -18,6 +18,17 @@ enum tv_AttrType{
   TV_VERTEX_ATTR_END=1<<3
 };
 
+/*
+ * tv_VertexPrimitive is an enumeration of vertex primitives that may be used
+ * to render a mesh.
+ */
+enum tv_VertexPrimitive{
+  TV_VERTEX_PRIMITIVE_TRIANGLES,
+  TV_VERTEX_PRIMITIVE_TRIANGLE_STRIP,
+  TV_VERTEX_PRIMITIVE_TRIANGLE_QUADS,
+  TV_VERTEX_PRIMITIVE_TRIANGLE_LINES
+};
+
 /* MeshPos is a struct that represents an XYZW vertex position. */
 struct MeshPos{
   uint8_t x, y, z, w;
@@ -52,6 +63,7 @@ struct MeshBuffer{
 struct Mesh{
   TV_COMPONENT
   uint16_t numVerts;
+  uint16_t primitive;
   uint8_t numBuffs;
   uint8_t buffers[];
 };

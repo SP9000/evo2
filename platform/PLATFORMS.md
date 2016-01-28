@@ -27,7 +27,7 @@ void tv_Draw(Mesh*, Material*)
 ```
 Draw the given mesh (applying the provided material in the process).
 
-#### Input Functions 
+### Input Functions 
 ```
 void tv_InputInit(void)
 ```
@@ -49,6 +49,19 @@ void tv_AudioPlay(AudioClip,bool)
 ```
 Play the given audioclip (looping if requested. 
 
+
+### GUI Functions
+GUI functionality is separate from general rendering functionality to simplify the exploitation of 2D-hardware acceleration or framebuffer blitting by platforms where such methods are more efficient.
+The GUI functionality is intentionally basic and leaves more complex UI heirarchies up to the application.
+```
+void tv_GuiRect(unsigned,unsigned,unsigned,unsigned);
+```
+Draws a rectangle at the given (x,y,w,h) rectangle.
+
+```
+void tv_GuiText(unsigned,unsigned,const char*)
+```
+Draws the given text at the (x,y) coordinates provided.  Robust implementations should handle escape codes for colored text.
 
 ## Adding a new platform
 To add a new target platform:

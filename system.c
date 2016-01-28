@@ -17,8 +17,9 @@ void tv_SystemStart()
 {
   unsigned i;
   for(i = 0; i < numSystems; ++i){
-    if(systems[i].enabled && systems[i].Start != NULL)
-      tv_EntityStartAll(systems[i].Implements, systems[i].Start);
+    if(systems[i].enabled)
+      tv_EntityStartAll(systems[i].Implements, systems[i].Start,
+          systems[i].cache);
   }
 }
 

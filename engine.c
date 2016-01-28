@@ -13,6 +13,7 @@ void tv_EngineQuit();
 int tv_EngineInit()
 {
   tv_DrawInit();
+  tv_InputInit();
   CONNECT(Kill, tv_EngineQuit);
   return 0;
 }
@@ -27,13 +28,14 @@ void tv_EngineTick()
   }
   tv_DrawStartFrame();
   tv_InputUpdate();
-  /* TODO: update systems */
+  tv_SystemUpdate();
   tv_DrawEndFrame();
 }
 
 /* tv_EngineRun runs the engine until it is terminated. */
 void tv_EngineRun()
 {
+  tv_SystemStart();
   for(run = true; run;){
     tv_EngineTick();
   }

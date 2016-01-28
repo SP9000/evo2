@@ -3,11 +3,20 @@
 #include <GL/glew.h>
 #include "debug.h"
 #include "draw.h"
+#include "input.h"
 #include "matrix.h"
+
+enum{
+  MAX_MESHES = 10000
+};
 
 static SDL_Window *win; /* SDL window to render to. */
 static SDL_GLContext *glCtx; /* OpenGL context. */
-static struct Mat4x4 mvpMat; /* the main modelview-projection matrix to render with. */
+
+static struct Mat4x4 projMat; /* the projection matrix. */
+static struct Mat4x4 mvMat;   /* the modelview matrix. */
+static struct Mat4x4 mvpMat;  /* the main modelview-projection matrix. */
+static struct Mat4x4 guiMat;  /* the mvp mat used for rendering the GUI. */
 
 /* vertexShader is the vertex shader used for all rendering. */
 GLchar const *vertexShader[] = {
@@ -35,6 +44,19 @@ GLchar const *fragmentShader[] = {
     "  out_color = out_col;\n"
     "}\n"
 };
+
+/* loadedMeshes is a table of GL-state associated with all loaded meshes. */
+/* XXX: should really be hash table, but until it's an issue... */
+struct BufferedMesh{
+  struct Mesh *mesh;
+  GLuint vao;
+  struct{
+    GLuint pos, col;
+  }buffs;
+  struct{
+    GLuint pos, col;
+  }attrs;
+}loadedMeshes[MAX_MESHES];
 
 static GLuint program;  /* the shader program. */
 static GLuint mvp;      /* the modelview matrix uniform handle. */
@@ -159,8 +181,11 @@ int tv_DrawInit()
   }
   glViewport(0,0,640,480);
 
-  mat4x4_perspective(&mvpMat, 45.0f, 640.0f/480.0f, 0.01f, 100.0f);
-  mat4x4_translate(&mvpMat, 0.0f, 0.0f, -6.0f);
+  mat4x4_perspective(&projMat, 80.0f, 640.0f/480.0f, 0.01f, 100.0f);
+  mat4x4_load_identity(&mvMat);
+  mat4x4_translate(&mvMat, 0.0f, 0.0f, -6.0f);
+
+  mat4x4_orthographic(&guiMat, 0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f);
   return 0;
 }
 
@@ -182,55 +207,196 @@ void tv_DrawEndFrame()
   SDL_GL_SwapWindow(win);
 }
 
-/* tv_Draw draws the given mesh with the given material. */
-void tv_Draw(struct Mesh *mesh, struct Material *mat)
+/* bufferMesh creates and buffers the mesh data into VBO's. */
+static struct BufferedMesh * bufferMesh(struct Mesh *mesh)
 {
-  struct{
-    GLuint pos, col;
-  }buffs;
-  struct{
-    GLuint pos, col;
-  }attrs;
+  int i;
+  struct BufferedMesh *m;
   uint8_t *vb, *cb;
-  GLuint vao;
+
+  for(i = 0; i < MAX_MESHES; ++i){
+    if(loadedMeshes[i].mesh == NULL){
+      m = loadedMeshes + i;
+      break;
+    }
+  }
+  if(i >= MAX_MESHES)
+    return NULL;
 
   vb = mesh->buffers;
   cb = vb + sizeof(struct MeshAttr) * mesh->numVerts;
- 
-  //XXX: store vbo's in table (don't rebuffer each frame)
-  glGenBuffers(1, &buffs.pos);
-  glGenBuffers(1, &buffs.col);
-  glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
+
+  glGenBuffers(1, &m->buffs.pos);
+  glGenBuffers(1, &m->buffs.col);
+  glBindBuffer(GL_ARRAY_BUFFER, m->buffs.pos);
   glBufferData(GL_ARRAY_BUFFER, sizeof(struct MeshAttr) * mesh->numVerts,
       vb, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, buffs.col);
+  glBindBuffer(GL_ARRAY_BUFFER, m->buffs.col);
   glBufferData(GL_ARRAY_BUFFER, sizeof(struct MeshAttr) * mesh->numVerts,
       cb, GL_STATIC_DRAW);
 
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
+  glGenVertexArrays(1, &m->vao);
+  glBindVertexArray(m->vao);
 
-  //XXX: same with attributes
-  attrs.pos = glGetAttribLocation(program, "pos");
-  if(attrs.pos == -1)
+  m->attrs.pos = glGetAttribLocation(program, "pos");
+  if(m->attrs.pos == -1)
     debug_puts("error: could not find attribute \"pos\" in shader program.");
-  attrs.col = glGetAttribLocation(program, "col");
-  if(attrs.col == -1)
+  m->attrs.col = glGetAttribLocation(program, "col");
+  if(m->attrs.col == -1)
     debug_puts("error: could not find attribute \"col\" in shader program.");
 
+  glBindVertexArray(0);
+  m->mesh = mesh;
+  return m;
+}
+
+/* getMesh retrieves mesh from the table of loaded meshes (if it exists). */
+static struct BufferedMesh * getMesh(struct Mesh *mesh)
+{
+  int i;
+  for(i = 0; i < MAX_MESHES; ++i){
+    if(loadedMeshes[i].mesh == mesh)
+      return loadedMeshes + i;
+  }
+  return NULL;
+}
+
+/* tv_Draw draws the given mesh with the given material. */
+void tv_Draw(struct Mesh *mesh, struct Material *mat)
+{
+  struct BufferedMesh *m;
+
+  m = getMesh(mesh);
+  if(m == NULL)
+    m = bufferMesh(mesh);
+  if(m == NULL)
+    return;
+
+  mvpMat = mat4x4_multiply(projMat, mvMat);
   glUniformMatrix4fv(mvp, 1, GL_FALSE, mat4x4_to_array(&mvpMat));
+
+  glBindVertexArray(m->vao);
+
+  glEnableVertexAttribArray(m->attrs.pos);
+  glBindBuffer(GL_ARRAY_BUFFER, m->buffs.pos);
+  glVertexAttribPointer(m->attrs.pos, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+
+  glEnableVertexAttribArray(m->attrs.col);
+  glBindBuffer(GL_ARRAY_BUFFER, m->buffs.col);
+  glVertexAttribPointer(m->attrs.col, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+
+  glDrawArrays(GL_TRIANGLES, 0, m->mesh->numVerts);
+  glBindVertexArray(0);
+}
+
+/* tv_DrawModelview sets the modelview matrix to render with. */
+void tv_DrawModelview(struct Mat4x4* mv)
+{
+  mvMat = *mv;
+}
+
+/* tv_InputInit initializes the engine for receiving/dispatching user input. */
+void tv_InputInit()
+{
+  SDL_SetRelativeMouseMode(true);
+}
+
+/* tv_InputUpdate polls input device(s) and emits input events. */
+void tv_InputUpdate()
+{
+  SDL_Event evt;
+  int xrel, yrel;
+
+  while(SDL_PollEvent(&evt)){
+    switch(evt.type){
+    case SDL_QUIT:
+      EMIT(Kill)
+      break;
+    case SDL_KEYDOWN:
+      if(evt.key.keysym.sym == SDLK_ESCAPE)
+        EMIT(Kill)
+      else
+        EMIT(ButtonDown, evt.key.keysym.scancode)
+      break;
+    case SDL_KEYUP:
+      EMIT(ButtonUp, evt.key.keysym.scancode)
+      break;
+    default:
+      break;
+    }
+    SDL_GetRelativeMouseState(&xrel, &yrel);
+    if(xrel != 0)
+      EMIT(AxisMoved, TV_INPUT_AXIS0, xrel)
+    if(yrel != 0)
+      EMIT(AxisMoved, TV_INPUT_AXIS1, yrel)
+  }
+}
+
+/* tv_GuiRect draws a w x h rectangle @ (x,y). */
+void tv_GuiRect(unsigned x, unsigned y, unsigned w, unsigned h, uint32_t rgba)
+{
+  static GLuint vao;
+  static struct {
+    GLuint col, pos;
+  }buffs;
+  static struct {
+    GLuint col, pos;
+  }attrs;
+  uint8_t r = (rgba & 0xff000000) >> 24;
+  uint8_t g = (rgba & 0x00ff0000) >> 16;
+  uint8_t b = (rgba & 0x0000ff00) >> 8;
+  uint8_t a = (rgba & 0x000000ff);
+  uint8_t c[] = {
+    r,g,b,a,
+    r,g,b,a,
+    r,g,b,a,
+    r,g,b,a,
+    r,g,b,a,
+    r,g,b,a,
+  };
+  uint16_t v[] = {
+    x,y,1,1,
+    x+w,y,1,1,
+    x+w,y+h,1,1,
+    x,y,1,1,
+    x+w,y+h,1,1,
+    x,y+h,1,1
+  };
+
+  if(vao == 0){
+    glGenBuffers(1, &buffs.pos);
+    glGenBuffers(1, &buffs.col);
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    attrs.pos = glGetAttribLocation(program, "pos");
+    if(attrs.pos == -1)
+      debug_puts("error: could not find attribute \"pos\" in shader program.");
+    attrs.col = glGetAttribLocation(program, "col");
+    if(attrs.col == -1)
+      debug_puts("error: could not find attribute \"col\" in shader program.");
+  }
+  glBindVertexArray(vao);
+  glUniformMatrix4fv(mvp, 1, GL_FALSE, mat4x4_to_array(&guiMat));
+  glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, buffs.col);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(c), c, GL_STATIC_DRAW);
+
   glEnableVertexAttribArray(attrs.pos);
   glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
-  glVertexAttribPointer(attrs.pos, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+  glVertexAttribPointer(attrs.pos, 4, GL_UNSIGNED_SHORT, GL_FALSE, 0, 0);
 
   glEnableVertexAttribArray(attrs.col);
   glBindBuffer(GL_ARRAY_BUFFER, buffs.col);
   glVertexAttribPointer(attrs.col, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
 
-  glDrawArrays(GL_TRIANGLES, 0, mesh->numVerts);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
-
-  glDeleteBuffers(1, &buffs.pos);
-  glDeleteBuffers(1, &buffs.col);
-  glDeleteVertexArrays(1, &vao);
 }
+
+/* tv_GuiText displays text @ (x,y) wrapping as necessary. */
+void tv_GuiText(unsigned x, unsigned y, const char *text)
+{
+}
+
