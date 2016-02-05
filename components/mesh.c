@@ -3,6 +3,49 @@
 #include "entity.h"
 #include "mesh.h"
 
+/* getVertex returns the ith vertex belonging to mesh. */
+static uint8_t * getVertex(struct Mesh *mesh, unsigned i)
+{
+  if(i > mesh->numVerts || mesh->numBuffs < 1)
+    return NULL;
+  return mesh->buffers[i * 4];
+}
+
+/* getAABB generates an AABB for mesh. */
+static void getAABB(struct Mesh *mesh)
+{
+  uint8_t minX, maxX;
+  uint8_t minY, maxY;
+  uint8_t minZ, maxZ;
+  unsigned i;
+
+  if(mesh->numVerts <= 0 || mesh->numBuffers < 1)
+    return;
+
+  for(i = 0; i < mesh->numVerts; ++i){
+    uint8_t *v;
+    v = getVertex(mesh, i);
+    if(v[0] < minX)
+      minX = v[0];
+    if(v[0] > maxX)
+      maxX = v[0];
+
+    if(v[0] < minX)
+      minY = v[1];
+    if(v[0] > maxX)
+      maxY = v[1];
+
+    if(v[0] < minX)
+      minZ = v[2];
+    if(v[0] > maxX)
+      maxZ = v[2];
+  }
+
+  mesh->aabb.w = maxX - minX;
+  mesh->aabb.h = maxY - minY;
+  mesh->aabb.d = maxZ - minZ;
+}
+
 /* makeQuad initializes the mesh component c to a simple white quad. */
 static void makeQuad(void *c)
 {

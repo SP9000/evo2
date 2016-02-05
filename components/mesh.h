@@ -53,6 +53,11 @@ struct MeshAttr{
   };
 };
 
+/* AABB is a struct representing an axis-aligned bounding box. */
+struct AABB{
+  uint8_t w, h, d;
+};
+
 /* MeshBuffer is a struct that holds per-vertex data for 1 attribute. */
 struct MeshBuffer{
   uint8_t type;
@@ -62,6 +67,7 @@ struct MeshBuffer{
 /* Mesh is a component that all associated buffers needed to render geometry. */
 struct Mesh{
   TV_COMPONENT
+  struct AABB aabb;
   uint16_t numVerts;
   uint16_t primitive;
   uint8_t numBuffs;
