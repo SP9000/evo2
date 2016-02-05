@@ -30,14 +30,14 @@ static void getAABB(struct Mesh *mesh)
     if(v[0] > maxX)
       maxX = v[0];
 
-    if(v[0] < minX)
+    if(v[0] < minY)
       minY = v[1];
-    if(v[0] > maxX)
+    if(v[0] > maxY)
       maxY = v[1];
 
-    if(v[0] < minX)
+    if(v[0] < minZ)
       minZ = v[2];
-    if(v[0] > maxX)
+    if(v[0] > maxZ)
       maxZ = v[2];
   }
 
