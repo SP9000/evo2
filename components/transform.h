@@ -9,13 +9,13 @@
  * rotation, and scale in the scene.
  */
 struct Transform{
-  TV_COMPONENT
-  tv_Vector3 pos;
-  tv_Quaternion rot;
-  tv_Vector3 scale;
+	TV_COMPONENT
+	tv_Vector3 pos;
+	tv_Quaternion rot;
+	tv_Vector3 scale;
 };
 
 /* NewTransform creates a new transform component. */
-struct Transform NewTransform();
+struct Transform NewTransform(tv_Vector3,tv_Quaternion,tv_Vector3);
 
 #endif

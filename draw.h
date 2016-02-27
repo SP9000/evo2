@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "components/material.h"
 #include "components/mesh.h"
+#include "components/transform.h"
 #include "matrix.h"
 
 int tv_DrawInit();
