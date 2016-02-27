@@ -19,7 +19,7 @@ static void getAABB(struct Mesh *mesh)
   uint8_t minZ, maxZ;
   unsigned i;
 
-  if(mesh->numVerts <= 0 || mesh->numBuffers < 1)
+  if(mesh->numVerts <= 0 || mesh->numBuffs < 1)
     return;
 
   for(i = 0; i < mesh->numVerts; ++i){
