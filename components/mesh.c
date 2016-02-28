@@ -1,14 +1,16 @@
 #include <string.h>
-#include "components/enum.h"
+#include "debug.h"
 #include "entity.h"
 #include "mesh.h"
+
+#include "components/enum.h"
 
 /* getVertex returns the ith vertex belonging to mesh. */
 static uint8_t * getVertex(struct Mesh *mesh, unsigned i)
 {
 	if(i > mesh->numVerts || mesh->numBuffs < 1)
 		return NULL;
-	return mesh->buffers[i * 4];
+	return mesh->buffers + (i * 4);
 }
 
 /* getAABB generates an AABB for mesh. */
@@ -61,9 +63,9 @@ static void makeQuad(void *c)
 		{.pos = {0,255,0,255}}
 	};
 	const struct MeshAttr col[] = {
-		{.col = {0xff,0xff,0xff,0xff}},
-		{.col = {0xff,0xff,0xff,0xff}},
-		{.col = {0xff,0xff,0xff,0xff}},
+		{.col = {0xff,0x00,0xff,0xff}},
+		{.col = {0xff,0x00,0xff,0xff}},
+		{.col = {0xff,0x00,0xff,0xff}},
 
 		{.col = {0xff,0xff,0xff,0xff}},
 		{.col = {0xff,0xff,0xff,0xff}},
@@ -109,4 +111,18 @@ struct Mesh MeshNewQuad()
 		.numBuffs = 0,
 	};
 	return mesh;
+}
+
+/* MeshGetBuffer returns the address of the mesh's ith buffer. */
+uint8_t *MeshGetBuffer(struct Mesh *mesh, unsigned i)
+{
+	if(mesh == NULL){
+		debug_puts("NULL mesh");
+		return NULL;
+	}
+	if(i >= mesh->numBuffs){
+		debug_printf("buffer index %d out of range.\n", i);
+		return NULL;
+	}
+	return mesh->buffers + (i * mesh->numVerts * sizeof(struct MeshAttr));
 }

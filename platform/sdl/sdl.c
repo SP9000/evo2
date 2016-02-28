@@ -6,6 +6,8 @@
 #include "input.h"
 #include "matrix.h"
 
+#include "components/enum.h"
+
 enum{
 	MAX_MESHES = 10000
 };
@@ -265,7 +267,6 @@ static struct BufferedMesh * getMesh(struct Mesh *mesh)
 void tv_Draw(struct Mesh *mesh, struct Material *mat)
 {
 	struct BufferedMesh *m;
-	struct Transform t;
 
 	m = getMesh(mesh);
 	if(m == NULL)
@@ -312,24 +313,24 @@ void tv_InputUpdate()
 		switch(evt.type){
 			case SDL_QUIT:
 				EMIT(Kill)
-					break;
+				break;
 			case SDL_KEYDOWN:
 				if(evt.key.keysym.sym == SDLK_ESCAPE)
 					EMIT(Kill)
 				else
 					EMIT(ButtonDown, evt.key.keysym.scancode)
-						break;
+				break;
 			case SDL_KEYUP:
 				EMIT(ButtonUp, evt.key.keysym.scancode)
-					break;
+				break;
 			default:
 				break;
 		}
 		SDL_GetRelativeMouseState(&xrel, &yrel);
 		if(xrel != 0)
 			EMIT(AxisMoved, TV_INPUT_AXIS0, xrel)
-				if(yrel != 0)
-					EMIT(AxisMoved, TV_INPUT_AXIS1, yrel)
+			if(yrel != 0)
+				EMIT(AxisMoved, TV_INPUT_AXIS1, yrel)
 	}
 }
 
@@ -399,5 +400,37 @@ void tv_GuiRect(unsigned x, unsigned y, unsigned w, unsigned h, uint32_t rgba)
 /* tv_GuiText displays text @ (x,y) wrapping as necessary. */
 void tv_GuiText(unsigned x, unsigned y, const char *text)
 {
-}
+	static struct tv_Entity *glyph;
+	static struct Mesh *mesh;
+	static struct Material *material;
+	struct MeshTexco *texcos;
+	unsigned i;
 
+	if(glyph == NULL){
+		struct Mesh m;
+		m = MeshNewQuad();
+		glyph = tv_EntityNew(1,
+			COMPONENT_MESH, &mesh);
+		mesh = (struct Mesh*)tv_EntityGetComponent(glyph,
+				COMPONENT_MESH);
+		material = (struct Material*)tv_EntityGetComponent(glyph,
+				COMPONENT_MATERIAL);
+	}
+	texcos = (struct MeshTexco*)MeshGetBuffer(mesh, 1);
+	for(i = 0; i < strlen(text); ++i){
+		texcos->u = 0;
+		texcos->v = 0;
+		texcos->u = 0xffff;
+		texcos->v = 0;
+		texcos->u = 0xffff;
+		texcos->v = 0xffff;
+
+		texcos->u = 0;
+		texcos->v = 0;
+		texcos->u = 0xffff;
+		texcos->v = 0xffff;
+		texcos->u = 0;
+		texcos->v = 0xffff;
+	}
+	tv_Draw(mesh, material);
+}

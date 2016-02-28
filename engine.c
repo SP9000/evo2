@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "entity.h"
 #include "input.h"
+#include "system.h"
 
 static bool run;
 

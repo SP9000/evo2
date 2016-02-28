@@ -77,5 +77,6 @@ struct Mesh{
 struct Mesh NewMesh(uint16_t, uint16_t);
 size_t MeshSize(struct Mesh*);
 struct Mesh MeshNewQuad();
+uint8_t *MeshGetBuffer(struct Mesh*, unsigned);
 
 #endif
