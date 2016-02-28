@@ -67,6 +67,10 @@ extern const tv_Vector2 tv_Vector2Zero;
 extern const tv_Vector3 tv_Vector3Zero;
 extern const tv_Vector4 tv_Vector4Zero;
 
+extern const tv_Vector2 tv_Vector2One;
+extern const tv_Vector3 tv_Vector3One;
+extern const tv_Vector4 tv_Vector4One;
+
 extern const tv_Vector3 tv_Vector3Forward;
 extern const tv_Vector4 tv_Vector4Forward;
 

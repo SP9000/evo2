@@ -11,11 +11,7 @@ struct Transform NewTransform(tv_Vector3 pos,
 		},
 		.pos = pos,
 		.rot = rot,
-		.scale = {
-			.x = 1,
-			.y = 1,
-			.z = 1
-		}
+		.scale = scale
 	};
 	return t;
 }
