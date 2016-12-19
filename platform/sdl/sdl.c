@@ -188,6 +188,10 @@ int tv_DrawInit()
 	mat4x4_translate(&mvMat, 0.0f, 0.0f, -6.0f);
 
 	mat4x4_orthographic(&guiMat, 0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f);
+
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_DEPTH_TEST);
+
 	return 0;
 }
 
@@ -200,7 +204,7 @@ void tv_DrawQuit()
 /* tv_DrawStartFrame prepares for rendering a new frame. */
 void tv_DrawStartFrame()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 /*  tv_DrawEndFrame is called when all rendering for the current frame is done. */
@@ -406,16 +410,19 @@ void tv_GuiText(unsigned x, unsigned y, const char *text)
 	struct MeshTexco *texcos;
 	unsigned i;
 
+#if 0
 	if(glyph == NULL){
 		struct Mesh m;
 		m = MeshNewQuad();
 		glyph = tv_EntityNew(1,
 			COMPONENT_MESH, &mesh);
+		glyph->start(glyph);
 		mesh = (struct Mesh*)tv_EntityGetComponent(glyph,
 				COMPONENT_MESH);
 		material = (struct Material*)tv_EntityGetComponent(glyph,
 				COMPONENT_MATERIAL);
 	}
+#endif
 	texcos = (struct MeshTexco*)MeshGetBuffer(mesh, 1);
 	for(i = 0; i < strlen(text); ++i){
 		texcos->u = 0;
