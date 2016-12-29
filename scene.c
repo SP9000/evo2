@@ -1,64 +1,96 @@
+#include "scene.h"
+#include "components/collider.h"
+#include "components/enum.h"
+#include "components/transform.h"
 #include "debug.h"
 #include "entity.h"
-#include "scene.h"
 
-enum{
-  SCENE_MAX_DYNAMIC_ENTITIES = 100
-};
+enum { SCENE_MAX_DYNAMIC_ENTITIES = 100 };
 
 static struct tv_Entity *dynamicGraph[SCENE_MAX_DYNAMIC_ENTITIES];
 static int numDynamic;
 
 /* tv_SceneAdd adds e to the scene. */
-//XXX
-void tv_SceneAdd(struct tv_Entity *e)
-{
-  static int seek;
-  int i, wrap;
+// XXX
+void tv_SceneAdd(struct tv_Entity *e) {
+	static int seek;
+	int i, wrap;
 
-  if(numDynamic >= SCENE_MAX_DYNAMIC_ENTITIES)
-    return;
-  for(i = wrap = seek; i < SCENE_MAX_DYNAMIC_ENTITIES; ++i){
-    if(dynamicGraph[i] == NULL){
-      dynamicGraph[i] = e;
-      break;
-    }
-    if(i == (wrap-1)){
-      return;
-    }
-  }
-  numDynamic++;
+	if (numDynamic >= SCENE_MAX_DYNAMIC_ENTITIES)
+		return;
+	for (i = wrap = seek; i < SCENE_MAX_DYNAMIC_ENTITIES; ++i) {
+		if (dynamicGraph[i] == NULL) {
+			dynamicGraph[i] = e;
+			break;
+		}
+		if (i == (wrap - 1)) {
+			return;
+		}
+	}
+	numDynamic++;
 }
 
 /* tv_SceneRemove removes e from the scene. */
-void tv_SceneRemove(struct tv_Entity *e)
-{
-  int i;
-  if(numDynamic < 1)
-    return;
-  for(i = 0; i < SCENE_MAX_DYNAMIC_ENTITIES; ++i){
-    if(dynamicGraph[i] == e){
-      dynamicGraph[i] = NULL;
-      break;
-    }
-  }
-  if(i < SCENE_MAX_DYNAMIC_ENTITIES)
-    numDynamic--;
+void tv_SceneRemove(struct tv_Entity *e) {
+	int i;
+	if (numDynamic < 1)
+		return;
+	for (i = 0; i < SCENE_MAX_DYNAMIC_ENTITIES; ++i) {
+		if (dynamicGraph[i] == e) {
+			dynamicGraph[i] = NULL;
+			break;
+		}
+	}
+	if (i < SCENE_MAX_DYNAMIC_ENTITIES)
+		numDynamic--;
 }
 
 #ifdef DEBUG
 /* tv_ScenePrint prints a textual representation of the scenegraph. */
-void tv_ScenePrint()
-{
-  int i;
-  debug_puts("dynamic scene entities:");
-  for(i = 0; i < SCENE_MAX_DYNAMIC_ENTITIES; ++i){
-    if(dynamicGraph[i] != NULL)
-      debug_printf(" %d: %p\n", i, dynamicGraph[i]);
-  }
-  debug_puts("end");
+void tv_ScenePrint() {
+	int i;
+	debug_puts("dynamic scene entities:");
+	for (i = 0; i < SCENE_MAX_DYNAMIC_ENTITIES; ++i) {
+		if (dynamicGraph[i] != NULL)
+			debug_printf(" %d: %p\n", i, dynamicGraph[i]);
+	}
+	debug_puts("end");
 }
 #endif
+
+bool tv_SceneRaycast(tv_Vector3 start, tv_Vector3 dir, struct tv_Entity **) {
+	int i;
+
+	for (i = 0; i < numDynamic; ++i) {
+		struct Collider *col;
+		float a, b, radius;
+		tv_Vector3 o, c, o_minus_c;
+		struct Transform *t;
+		struct tv_Entity *e;
+		bool anyCollisions;
+
+		e = dynamicGraph[i];
+		t = (struct Transform *)tv_EntityGetComponent(
+		    e, COMPONENT_TRANSFORM);
+		col = (struct Collider *)tv_EntityGetComponent(
+		    e, COMPONENT_COLLIDER);
+		radius = col->radius;
+
+		o = start;  /* origin of line */
+		c = t->pos; /* center of sphere */
+		tv_Vector3Sub(o, c, &o_minus_c);
+
+		a = tv_Vector3Mag(&o_minus_c);
+		a *= a;
+		b = tv_Vector3Dot(dir, o_minus_c);
+		b *= b;
+
+		if (!anyCollisions) {
+			anyCollisions = (b - a + (radius * radius)) >= 0.0f;
+		}
+	}
+	return anyCollisions;
+}
 
 #if 0
 enum{
@@ -211,6 +243,3 @@ void tv_ScenePrint()
   }
 }
 #endif
-
-#endif
-

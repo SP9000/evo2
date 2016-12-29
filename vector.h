@@ -7,18 +7,12 @@
 /**
  * A basic type for representing a point in 2-dimensional space.
  */
-typedef struct tv_Vector2 
-{
-    float x, y;
-}tv_Vector2;
+typedef struct tv_Vector2 { float x, y; } tv_Vector2;
 
 /**
  * A basic type for representing a point in 3-dimensional space.
  */
-typedef struct tv_Vector3 
-{
-    float x, y, z;
-}tv_Vector3;
+typedef struct tv_Vector3 { float x, y, z; } tv_Vector3;
 
 /**
  * A type for representing the position, scale, and rotation of an object.
@@ -27,15 +21,14 @@ typedef struct tagTvTransform {
 	tv_Vector3 position;
 	tv_Vector3 scale;
 	tv_Vector3 rotation;
-}TvTransform;
+} TvTransform;
 
 /**
  * A type for representing a rectangle.
  */
-struct tv_Rect 
-{
-    float x, y;
-    float w, h;
+struct tv_Rect {
+	float x, y;
+	float w, h;
 };
 
 /**
@@ -51,15 +44,12 @@ bool tv_RectContains(struct tv_Rect r, tv_Vector2 point);
  * @param r2 the...second...rectangle.
  * @return TRUE if the rectangles overlap, else FALSE.
  */
-bool tv_RectOverlaps(struct tv_Rect* r1, struct tv_Rect* r2);
+bool tv_RectOverlaps(struct tv_Rect *r1, struct tv_Rect *r2);
 
 /**
  * A basic type for representing a point in 4-dimensional space
  */
-typedef struct tv_Vector4 
-{
-	float x, y, z, w;
-}tv_Vector4;
+typedef struct tv_Vector4 { float x, y, z, w; } tv_Vector4;
 
 typedef tv_Vector4 tv_Quaternion;
 
@@ -80,18 +70,18 @@ tv_Vector3 tv_Vector3_new(float x, float y, float z);
 tv_Vector4 tv_Vector4_new(float x, float y, float z, float w);
 
 /* add */
-void tv_Vector2Add(tv_Vector2 v1, tv_Vector2 v2, tv_Vector2* result);
-void tv_Vector3Add(tv_Vector3 v1, tv_Vector3 v2, tv_Vector3* result);
-void tv_Vector4Add(tv_Vector4 v1, tv_Vector4 v2, tv_Vector4* result);
+void tv_Vector2Add(tv_Vector2 v1, tv_Vector2 v2, tv_Vector2 *result);
+void tv_Vector3Add(tv_Vector3 v1, tv_Vector3 v2, tv_Vector3 *result);
+void tv_Vector4Add(tv_Vector4 v1, tv_Vector4 v2, tv_Vector4 *result);
 
 /* sub */
-void tv_Vector2Sub(tv_Vector2 v1, tv_Vector2 v2, tv_Vector2* result);
-void tv_Vector3Sub(tv_Vector3 v1, tv_Vector3 v2, tv_Vector3* result);
-void tv_Vector4Sub(tv_Vector4 v1, tv_Vector4 v2, tv_Vector4* result);
+void tv_Vector2Sub(tv_Vector2 v1, tv_Vector2 v2, tv_Vector2 *result);
+void tv_Vector3Sub(tv_Vector3 v1, tv_Vector3 v2, tv_Vector3 *result);
+void tv_Vector4Sub(tv_Vector4 v1, tv_Vector4 v2, tv_Vector4 *result);
 
 /* normalize */
-void tv_Vector2Normalize(tv_Vector2 v, tv_Vector2* result);
-void tv_Vector3Normalize(tv_Vector3 v, tv_Vector3* result);
+void tv_Vector2Normalize(tv_Vector2 v, tv_Vector2 *result);
+void tv_Vector3Normalize(tv_Vector3 v, tv_Vector3 *result);
 
 /* scale */
 void tv_Vector2Scale(tv_Vector2 *v, float factor);
@@ -99,9 +89,9 @@ void tv_Vector3Scale(tv_Vector3 *v, float factor);
 void tv_Vector4Scale(tv_Vector4 *v, float factor);
 
 /* cross product */
-float tv_Vector2Cross(tv_Vector2* v1, tv_Vector2* v2);
-void tv_Vector3Cross(tv_Vector3* v1, tv_Vector3* v2, tv_Vector3* result);
-void tv_Vector4Cross(tv_Vector4* v1, tv_Vector4* v2, tv_Vector4* result);
+float tv_Vector2Cross(tv_Vector2 *v1, tv_Vector2 *v2);
+void tv_Vector3Cross(tv_Vector3 *v1, tv_Vector3 *v2, tv_Vector3 *result);
+void tv_Vector4Cross(tv_Vector4 *v1, tv_Vector4 *v2, tv_Vector4 *result);
 
 /* dot-product */
 float tv_Vector2Dot(tv_Vector2 v1, tv_Vector2 v2);
@@ -114,8 +104,8 @@ float tv_Vector3Distance(tv_Vector3 v1, tv_Vector3 v2);
 float tv_Vector4Distance(tv_Vector4 v1, tv_Vector4 v2);
 
 /* magnitude */
-float tv_Vector2Mag(tv_Vector2* v);
-float tv_Vector3Mag(tv_Vector3* v);
+float tv_Vector2Mag(tv_Vector2 *v);
+float tv_Vector3Mag(tv_Vector3 *v);
 
 /**
  * Get the unit direction vector from v1 to v2.
@@ -130,7 +120,7 @@ void tv_Vector3Direction(tv_Vector3 v1, tv_Vector3 v2, tv_Vector3 *result);
  * @param v1 the first vector to interpolate from.
  * @param v2 the vector to interpolate to.
  * @param t the time (0-1)
- * @return the new vector 
+ * @return the new vector
  */
 tv_Vector2 tv_Vector2Lerp(tv_Vector2 v1, tv_Vector2 v2, float t);
 

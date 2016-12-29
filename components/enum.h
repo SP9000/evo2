@@ -3,7 +3,7 @@
 
 /*
  * This enumeration contains the unique identifiers for every component.
- * Component's, in their "New" function, must assign their id to the 
+ * Component's, in their "New" function, must assign their id to the
  * appropriate value.
  * example:
  *   struct MyComponent * NewMyComponent()
@@ -13,17 +13,16 @@
  *     ...
  *   }
  */
-enum{
-  COMPONENT_TRANSFORM = 1,
-  COMPONENT_MESH,
-  COMPONENT_MATERIAL,
-  COMPONENT_PARTICLES,
-  COMPONENT_COLLIDER,
-  COMPONENT_CAM,
-  COMPONENT_TERRAIN,
-  COMPONENT_GUITEXT,
+enum { COMPONENT_TRANSFORM = 1,
+       COMPONENT_MESH,
+       COMPONENT_MATERIAL,
+       COMPONENT_PARTICLES,
+       COMPONENT_COLLIDER,
+       COMPONENT_CAM,
+       COMPONENT_TERRAIN,
+       COMPONENT_GUITEXT,
 
-  COMPONENT_END /* must be at end - end of component enumeration */
+       COMPONENT_END /* must be at end - end of component enumeration */
 };
 
 #endif
