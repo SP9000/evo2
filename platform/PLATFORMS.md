@@ -23,7 +23,7 @@ void tv_DrawEndFrame(void)
 Stop accepting draw commands and copy the backbuffer to the framebuffer.
 
 ```
-void tv_Draw(Mesh*, Material*)
+void tv_Draw(Cam*, Mesh*, Material*)
 ```
 Draw the given mesh (applying the provided material in the process).
 

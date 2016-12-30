@@ -10,7 +10,8 @@ const float screen_h = 480;
 struct Cam NewCam() {
 	struct Cam c = {.C = {.size = sizeof(struct Cam)},
 	                .pos = {0, 0, 0},
-	                .rot = {0, 0, 0}};
+	                .rot = {0, 0, 0},
+	                .viewport = {0, 0, 640, 480}};
 	mat4x4_perspective(&c.proj, 45.0f, 640.0f / 480.0f, 0, 100);
 	return c;
 }
@@ -115,4 +116,12 @@ bool tv_CamRaypick(struct Cam *c, tv_Vector2 screen_coordinates,
 	    start.x, start.y, start.z, dir.x, dir.y, dir.z);
 
 	return tv_SceneRaycast(start, dir, hits);
+}
+
+void tv_CamSetViewport(struct Cam *c, uint32_t x, uint32_t y, uint32_t w,
+                       uint32_t h) {
+	c->viewport.x = x;
+	c->viewport.y = y;
+	c->viewport.w = w;
+	c->viewport.h = h;
 }

@@ -9,8 +9,11 @@
 #include "system.h"
 
 #define SYSTEM_RENDER_MAX_MESHES 2048
+#define SYSTEM_RENDER_MAX_CAMS 8
 
 static struct Transform *cam; /* the camera to render with */
+static struct Cam *cams[SYSTEM_RENDER_MAX_CAMS];
+static int numCams;
 
 // XXX: proper scenegraph
 static struct meshinfo {
@@ -25,14 +28,18 @@ static void start(struct tv_Entity *e) {
 	struct Transform *transform;
 	struct Mesh *mesh;
 	struct Material *mat;
+	struct Cam *c;
 
 	transform =
 	    (struct Transform *)tv_EntityGetComponent(e, COMPONENT_TRANSFORM);
 	mat = (struct Material *)tv_EntityGetComponent(e, COMPONENT_MATERIAL);
 	mesh = (struct Mesh *)tv_EntityGetComponent(e, COMPONENT_MESH);
 
-	if (tv_EntityGetComponent(e, COMPONENT_CAM) != NULL) {
+	if ((c = (struct Cam *)tv_EntityGetComponent(e, COMPONENT_CAM)) !=
+	    NULL) {
 		cam = transform;
+		cams[numCams] = c;
+		numCams++;
 	}
 
 	if (mesh != NULL) {
@@ -74,7 +81,7 @@ static void render() {
 			                 -m->transform->pos.y,
 			                 -m->transform->pos.z);
 			tv_DrawModelview(&mv);
-			tv_Draw(m->mesh, m->mat);
+			tv_Draw(cams[0], m->mesh, m->mat);
 			mat4x4_pop(&mv);
 		}
 	}

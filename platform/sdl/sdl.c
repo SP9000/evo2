@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-#include "components/enum.h"
+#include "components/cam.h"
 
 extern void initGUI();
 
@@ -20,47 +20,27 @@ static struct Mat4x4 mvMat;   /* the modelview matrix. */
 static struct Mat4x4 mvpMat;  /* the main modelview-projection matrix. */
 
 /* vertexShader is the vertex shader used for all rendering. */
-GLchar const *vertexShader[] = {"#version 150\n"
-                                "in vec4 pos;\n"
-                                "in vec4 col;\n"
-                                "out vec4 out_col;\n"
-                                "uniform sampler2D tex;\n"
-                                "uniform mat4 mvp;\n"
-                                "void main()\n"
-                                "{\n"
-                                "  out_col = col;\n"
-                                "  gl_Position = mvp * pos;\n"
-                                "}\n"};
+static GLchar const *vertexShader[] = {"#version 150\n"
+                                       "in vec4 pos;\n"
+                                       "in vec4 col;\n"
+                                       "out vec4 out_col;\n"
+                                       "uniform sampler2D tex;\n"
+                                       "uniform mat4 mvp;\n"
+                                       "void main()\n"
+                                       "{\n"
+                                       "  out_col = col;\n"
+                                       "  gl_Position = mvp * pos;\n"
+                                       "}\n"};
 
 /* fragmentShader is the fragment shader used for all rendering. */
-GLchar const *fragmentShader[] = {"#version 150\n"
-                                  "in vec4 out_col;\n"
-                                  "out vec4 out_color;\n"
-                                  "uniform sampler2D tex;\n"
-                                  "void main()\n"
-                                  "{\n"
-                                  "  out_color = out_col;\n"
-                                  "}\n"};
-
-/* vertexTextShader is the vertex shader used for text rendering. */
-GLchar const *vertexTextShader[] = {"#version 150\n"
-                                    "uniform mat4 mvp;\n"
-                                    "in vec4 pos;"
-                                    "in vec2 texco;"
-                                    "out vec2 out_texco;"
-                                    "void main( void ) {"
-                                    "    pos = mvp * pos;\n"
-                                    "    out_texco = texco;\n"
-                                    "}\n"};
-
-/* fragmentTextShader is the fragment shader used for text rendering. */
-GLchar const *fragmentTextShader[] = {"#version 150\n"
-                                      "in vec2 out_texco;\n"
-                                      "uniform sampler2D tex0;\n"
-                                      "void main()\n"
-                                      "{\n"
-                                      "  out_color = texture(tex0, texco);\n"
-                                      "}\n"};
+static GLchar const *fragmentShader[] = {"#version 150\n"
+                                         "in vec4 out_col;\n"
+                                         "out vec4 out_color;\n"
+                                         "uniform sampler2D tex;\n"
+                                         "void main()\n"
+                                         "{\n"
+                                         "  out_color = out_col;\n"
+                                         "}\n"};
 
 /* loadedMeshes is a table of GL-state associated with all loaded meshes. */
 /* XXX: should really be hash table, but until it's an issue... */
@@ -284,8 +264,8 @@ static struct BufferedMesh *getMesh(struct Mesh *mesh) {
 	return NULL;
 }
 
-/* tv_Draw draws the given mesh with the given material. */
-void tv_Draw(struct Mesh *mesh, struct Material *mat) {
+/* tv_Draw draws the given mesh with the given material from c's view. */
+void tv_Draw(struct Cam *cam, struct Mesh *mesh, struct Material *mat) {
 	struct BufferedMesh *m;
 
 	m = getMesh(mesh);
@@ -293,6 +273,11 @@ void tv_Draw(struct Mesh *mesh, struct Material *mat) {
 		m = bufferMesh(mesh);
 	if (m == NULL)
 		return;
+
+	if (cam != NULL) {
+		glViewport(cam->viewport.x, cam->viewport.y, cam->viewport.w,
+		           cam->viewport.h);
+	}
 
 	mvpMat = mat4x4_multiply(projMat, mvMat);
 	glUniformMatrix4fv(mvp, 1, GL_FALSE, mat4x4_to_array(&mvpMat));

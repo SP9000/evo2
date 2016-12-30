@@ -58,16 +58,16 @@ void tv_ScenePrint() {
 }
 #endif
 
-bool tv_SceneRaycast(tv_Vector3 start, tv_Vector3 dir, struct tv_Entity **) {
-	int i;
+bool tv_SceneRaycast(tv_Vector3 start, tv_Vector3 dir,
+                     struct tv_Entity **hits) {
+	int i, numHits;
 
-	for (i = 0; i < numDynamic; ++i) {
+	for (i = 0, numHits = 0; i < numDynamic; ++i) {
 		struct Collider *col;
 		float a, b, radius;
 		tv_Vector3 o, c, o_minus_c;
 		struct Transform *t;
 		struct tv_Entity *e;
-		bool anyCollisions;
 
 		e = dynamicGraph[i];
 		t = (struct Transform *)tv_EntityGetComponent(
@@ -85,11 +85,12 @@ bool tv_SceneRaycast(tv_Vector3 start, tv_Vector3 dir, struct tv_Entity **) {
 		b = tv_Vector3Dot(dir, o_minus_c);
 		b *= b;
 
-		if (!anyCollisions) {
-			anyCollisions = (b - a + (radius * radius)) >= 0.0f;
+		if ((b - a + (radius * radius)) >= 0.0f) {
+			hits[numHits] = e;
+			numHits++;
 		}
 	}
-	return anyCollisions;
+	return numHits > 0;
 }
 
 #if 0
@@ -242,4 +243,6 @@ void tv_ScenePrint()
     printNode(n);
   }
 }
+#endif
+
 #endif
