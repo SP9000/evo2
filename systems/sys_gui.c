@@ -6,6 +6,9 @@
 #include <system.h>
 
 bool implements(struct tv_Entity *e) {
+	if (tv_EntityGetComponent(e, COMPONENT_TRANSFORM) == NULL)
+		return false;
+
 	/* TODO: implement simple inheritance or || all GUI types? */
 	return tv_EntityGetComponent(e, COMPONENT_GUITEXT) != NULL;
 }
@@ -25,6 +28,7 @@ void InitGUISystem() {
 	    .Start = NULL,
 	    .Update = update,
 	    .Implements = implements,
+	    .GlobalUpdate = NULL,
 	};
 	tv_RegisterSystem(&sys);
 }

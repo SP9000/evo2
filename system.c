@@ -8,6 +8,7 @@ static unsigned short numSystems;
 void tv_RegisterSystem(struct tv_System *sys) {
 	sys->enabled = true;
 	memcpy(&systems[numSystems], sys, sizeof(struct tv_System));
+	memset(systems[numSystems].cache, 0, sizeof(sys->cache));
 	numSystems++;
 }
 

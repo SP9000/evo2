@@ -8,12 +8,12 @@
 #define MAX_ENTITIES 10000
 
 static struct tv_Entity *entities[MAX_ENTITIES];
-static int numentities;
+static unsigned numentities;
 
 /* tv_EntityNew copies e into the engine. */
 struct tv_Entity *tv_EntityNew(int count, ...) {
 	struct tv_Entity *e;
-	int i, numComponents, size;
+	int i, size;
 	va_list ap;
 
 	uint16_t ids[TV_ENTITY_MAX_COMPONENTS] = {};
@@ -27,12 +27,11 @@ struct tv_Entity *tv_EntityNew(int count, ...) {
 		size += components[i]->size;
 	}
 	va_end(ap);
-	numComponents = i;
 
 	/* allocate entity and copy/init component data */
 	e = malloc(size + sizeof(struct tv_Entity));
 	memcpy(e->components, ids, sizeof(ids));
-	for (i = 0, size = 0; i < numComponents; ++i) {
+	for (i = 0, size = 0; i < count; ++i) {
 		struct tv_Component *c;
 		c = (struct tv_Component *)(e->data + size);
 		memcpy(c, components[i], components[i]->size);
@@ -83,7 +82,8 @@ void tv_EntityUpdateAll(bool (*test)(struct tv_Entity *),
 
 	if (cache[0] != NULL) {
 		for (i = 0; i < TV_SYSTEM_CACHE_SIZE; ++i)
-			update(cache[i]);
+			if (cache[i] != NULL)
+				update(cache[i]);
 		return;
 	}
 
@@ -96,11 +96,16 @@ void tv_EntityUpdateAll(bool (*test)(struct tv_Entity *),
 /* tv_EntityGetComponent returns e's component of type id - NULL if none. */
 struct tv_Component *tv_EntityGetComponent(struct tv_Entity *e, uint16_t id) {
 	unsigned i, offset;
+
+	if (e == NULL)
+		return NULL;
+
 	for (i = 0, offset = 0; i < TV_ENTITY_MAX_COMPONENTS; ++i) {
 		if (e->components[i] == id)
 			return (struct tv_Component *)(e->data + offset);
 		offset += ((struct tv_Component *)(e->data + offset))->size;
 	}
+
 	return NULL;
 }
 
