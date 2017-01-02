@@ -7,6 +7,6 @@
 enum { TV_GUI_W = 320, TV_GUI_H = 240 };
 
 void tv_GuiRect(unsigned, unsigned, unsigned, unsigned, uint32_t);
-void tv_GuiText(unsigned, unsigned, const char*);
+void tv_GuiText(unsigned, unsigned, const char *, unsigned);
 
 #endif

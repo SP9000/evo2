@@ -1,6 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "vector.h"
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -15,14 +16,13 @@
 #define TV_COMPONENT struct tv_Component C;
 
 /* tv_Component is a struct that contains essential component information. */
-struct tv_Component{
-	void (*init)(void*);
+struct tv_Component {
+	void (*init)(void *);
 	uint16_t size;
 };
 
 /* tv_Entity is the basic container of all entities in the engine. */
-struct tv_Entity 
-{
+struct tv_Entity {
 	/* unique name used to refer to this entity. */
 	char name[TV_ENTITY_NAMELEN];
 
@@ -33,17 +33,22 @@ struct tv_Entity
 	uint8_t data[];
 };
 
-struct tv_Entity * tv_EntityNew(int, ...);
-void tv_EntityDestroy(struct tv_Entity*);
-struct tv_Entity * tv_EntityAdd(struct tv_Entity*, uint16_t,
-		struct tv_Component*);
-struct tv_Entity * tv_EntityRemove(struct tv_Entity*, uint16_t);
-void tv_EntityStartAll(bool (*test)(struct tv_Entity*),
-		void (*start)(struct tv_Entity*), struct tv_Entity**);
-void tv_EntityUpdateAll(bool (*test)(struct tv_Entity*),
-		void (*update)(struct tv_Entity*), struct tv_Entity**);
+struct tv_Entity *tv_EntityNew(int, ...);
+void tv_EntityRename(struct tv_Entity *, char *);
+void tv_EntityDestroy(struct tv_Entity *);
+struct tv_Entity *tv_EntityAdd(struct tv_Entity *, uint16_t,
+                               struct tv_Component *);
+struct tv_Entity *tv_EntityRemove(struct tv_Entity *, uint16_t);
+void tv_EntityStartAll(bool (*test)(struct tv_Entity *),
+                       void (*start)(struct tv_Entity *), struct tv_Entity **);
+void tv_EntityUpdateAll(bool (*test)(struct tv_Entity *),
+                        void (*update)(struct tv_Entity *),
+                        struct tv_Entity **);
 
-unsigned tv_EntityNumComponents(struct tv_Entity*);
-struct tv_Component * tv_EntityGetComponent(struct tv_Entity*, uint16_t);
+unsigned tv_EntityNumComponents(struct tv_Entity *);
+struct tv_Component *tv_EntityGetComponent(struct tv_Entity *, uint16_t);
+struct tv_Entity *tv_EntityGet(char *);
+
+int tv_EntityInRadius(tv_Vector3, float, struct tv_Entity **);
 
 #endif

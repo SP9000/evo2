@@ -18,7 +18,7 @@ void update(struct tv_Entity *e) {
 	struct Transform *t;
 	t = (struct Transform *)tv_EntityGetComponent(e, COMPONENT_TRANSFORM);
 	g = (struct GUIText *)tv_EntityGetComponent(e, COMPONENT_GUITEXT);
-	tv_GuiText(t->pos.x, t->pos.y, g->text);
+	tv_GuiText(t->pos.x, t->pos.y, g->text, g->size);
 }
 
 /* sys_GUIInit initializes the GUI system for use by the engine. */

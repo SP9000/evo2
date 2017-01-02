@@ -1,6 +1,8 @@
 #include "entity.h"
 #include "components/enum.h"
+#include "components/transform.h"
 #include "system.h"
+#include "vector.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +41,9 @@ struct tv_Entity *tv_EntityNew(int count, ...) {
 			c->init(c);
 		size += components[i]->size;
 	}
+
+	strcpy(e->name, "unnamed");
+
 	entities[numentities] = e;
 	numentities++;
 	return e;
@@ -117,4 +122,41 @@ unsigned tv_EntityNumComponents(struct tv_Entity *e) {
 			return i;
 	}
 	return TV_ENTITY_MAX_COMPONENTS;
+}
+
+/* tv_EntityRename renames e to name. */
+void tv_EntityRename(struct tv_Entity *e, char *name) {
+	strncpy(e->name, name, sizeof(e->name));
+}
+
+/* tv_EntityGet returns the first entity found named name. */
+struct tv_Entity *tv_EntityGet(char *name) {
+	unsigned i;
+	for (i = 0; i < numentities; ++i) {
+		if (strcmp(entities[i]->name, name) == 0)
+			return entities[i];
+	}
+
+	return NULL;
+}
+
+/* tv_EntityInRadius fills found with all entities in radius and returns the
+ * number found. */
+int tv_EntityInRadius(tv_Vector3 origin, float radius,
+                      struct tv_Entity **found) {
+	unsigned i, numFound;
+
+	numFound = 0;
+	for (i = 0; i < numentities; ++i) {
+		struct Transform *t;
+		t = (struct Transform *)tv_EntityGetComponent(
+		    entities[i], COMPONENT_TRANSFORM);
+
+		if (tv_Vector3Distance(origin, t->pos) < radius) {
+			found[numFound] = entities[i];
+			numFound++;
+		}
+	}
+
+	return numFound;
 }

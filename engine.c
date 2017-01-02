@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "input.h"
 #include <SDL2/SDL.h>
+#include <system.h>
 
 static bool run;
 

@@ -6,6 +6,7 @@
 /* GUIText holds a short message. */
 struct GUIText {
 	TV_COMPONENT
+	uint16_t size;
 	char text[64];
 };
 
