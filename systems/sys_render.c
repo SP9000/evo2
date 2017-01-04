@@ -61,25 +61,24 @@ static void update(struct tv_Entity *e) {}
 /* render renders the scene as seen by cam. */
 static void render() {
 	int i;
-	struct Mat4x4 mv = Mat4x4Identity;
-
-	if (cam != NULL) {
-		mat4x4_rotate_x(&mv, cam->rot.x);
-		mat4x4_rotate_y(&mv, cam->rot.y);
-		mat4x4_translate(&mv, -cam->pos.x, -cam->pos.y, -cam->pos.z);
-	}
-
 	// XXX: render from scenegraph
 	for (i = 0; i < SYSTEM_RENDER_MAX_MESHES; ++i) {
 		if (meshes[i].mesh != NULL) {
+			struct Mat4x4 mv = Mat4x4Identity;
+
 			struct meshinfo *m = &meshes[i];
-			mat4x4_push(&mv);
-			mat4x4_translate(&mv, -m->transform->pos.x,
-			                 -m->transform->pos.y,
-			                 -m->transform->pos.z);
+			if (cam != NULL) {
+				mat4x4_rotate_y(&mv, cam->rot.y);
+				mat4x4_rotate_x(&mv, cam->rot.x);
+				mat4x4_translate(&mv, -cam->pos.x, -cam->pos.y,
+				                 -cam->pos.z);
+			}
+
+			mat4x4_translate(&mv, m->transform->pos.x,
+			                 m->transform->pos.y,
+			                 m->transform->pos.z);
 			tv_DrawModelview(&mv);
 			tv_Draw(cams[0], m->mesh, m->mat);
-			mat4x4_pop(&mv);
 		}
 	}
 }
