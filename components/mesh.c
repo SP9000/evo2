@@ -5,6 +5,34 @@
 
 #include "components/enum.h"
 
+/* attrSize returns the size of the given vertex attribute in bytes. */
+static unsigned attrSize(enum MeshAttrType a) {
+	switch (a) {
+	case TV_VERTEX_ATTR_POS:
+		return 4 * sizeof(uint8_t);
+	case TV_VERTEX_ATTR_COL:
+		return 4 * sizeof(uint8_t);
+	case TV_VERTEX_ATTR_UV:
+		return 2 * sizeof(uint16_t);
+	default:
+		break;
+	}
+
+	debug_printf("unrecognized vertex attribute %d\n", a);
+	return 4;
+}
+
+/* buffOffset returns the offset of the idxth buffer. */
+static unsigned buffOffset(struct Mesh *m, unsigned idx) {
+	unsigned i, offset;
+
+	offset = 0;
+	for (i = 0; i < idx; ++i) {
+		offset += attrSize(m->attributes[i]) * m->numVerts;
+	}
+	return offset;
+}
+
 /* getVertex returns the ith vertex belonging to mesh. */
 static uint8_t *getVertex(struct Mesh *mesh, unsigned i) {
 	if (i > mesh->numVerts || mesh->numBuffs < 1)
@@ -56,9 +84,9 @@ static void makeQuad(void *c) {
 
 	    {.pos = {0, 0, 0, 255}},     {.pos = {255, 255, 0, 255}},
 	    {.pos = {0, 255, 0, 255}}};
-	const struct MeshAttr col[] = {{.col = {0xff, 0x00, 0xff, 0xff}},
-	                               {.col = {0xff, 0x00, 0xff, 0xff}},
-	                               {.col = {0xff, 0x00, 0xff, 0xff}},
+	const struct MeshAttr col[] = {{.col = {0xff, 0xff, 0xff, 0xff}},
+	                               {.col = {0xff, 0xff, 0xff, 0xff}},
+	                               {.col = {0xff, 0xff, 0xff, 0xff}},
 
 	                               {.col = {0xff, 0xff, 0xff, 0xff}},
 	                               {.col = {0xff, 0xff, 0xff, 0xff}},
@@ -68,18 +96,21 @@ static void makeQuad(void *c) {
 	vb = (struct MeshBuffer *)(m->buffers);
 	cb = (struct MeshBuffer *)(m->buffers + sizeof(pos));
 
-	vb->type = TV_VERTEX_ATTR_POS;
-	cb->type = TV_VERTEX_ATTR_COL;
+	m->numBuffs = 2;
+	m->attributes[0] = TV_VERTEX_ATTR_POS;
+	m->attributes[1] = TV_VERTEX_ATTR_COL;
 	memcpy(vb, pos, sizeof(pos));
 	memcpy(cb, col, sizeof(col));
 };
 
 /* tv_NewMesh creates a new mesh pre-allocated with room for n vertices. */
 struct Mesh NewMesh(uint16_t n, uint16_t buffs) {
+	// XXX: stupidly reserves 16 bytes per vertex regardless of attribute
+	// type
 	struct Mesh mesh = {.C =
 	                        {
 	                            .size = sizeof(struct Mesh) +
-	                                    n * sizeof(struct MeshAttr) * buffs,
+	                                    n * 16 * sizeof(uint8_t) * buffs,
 	                        },
 	                    .primitive = TV_VERTEX_PRIMITIVE_TRIANGLES,
 	                    .numVerts = n,
@@ -87,7 +118,7 @@ struct Mesh NewMesh(uint16_t n, uint16_t buffs) {
 	return mesh;
 }
 
-/* MeshNewQuad creates returns a new mesh of a white qud. */
+/* MeshNewQuad creates and returns a new mesh of a white quad. */
 struct Mesh MeshNewQuad() {
 	struct Mesh mesh = {
 	    .C = {.size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
@@ -99,8 +130,8 @@ struct Mesh MeshNewQuad() {
 	return mesh;
 }
 
-/* MeshGetBuffer returns the address of the mesh's ith buffer. */
-uint8_t *MeshGetBuffer(struct Mesh *mesh, unsigned i) {
+/* MeshGetBufferAt returns the address of the mesh's ith buffer. */
+uint8_t *MeshGetBufferAt(struct Mesh *mesh, unsigned i) {
 	if (mesh == NULL) {
 		debug_puts("NULL mesh");
 		return NULL;
@@ -109,5 +140,37 @@ uint8_t *MeshGetBuffer(struct Mesh *mesh, unsigned i) {
 		debug_printf("buffer index %d out of range.\n", i);
 		return NULL;
 	}
-	return mesh->buffers + (i * mesh->numVerts * sizeof(struct MeshAttr));
+
+	return mesh->buffers + buffOffset(mesh, i);
+}
+
+/* MeshGetBuffer returns the buffer of the given attribute type. */
+uint8_t *MeshGetBuffer(struct Mesh *mesh, enum MeshAttrType type) {
+	unsigned i;
+
+	for (i = 0; i < mesh->numBuffs; ++i) {
+		if (mesh->attributes[i] == type) {
+			return mesh->buffers + buffOffset(mesh, i);
+		}
+	}
+
+	return NULL;
+}
+
+/* MeshColor sets all of mesh's vertices to the color c. */
+void MeshColor(struct Mesh *mesh, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+	unsigned i;
+	uint8_t *cb;
+
+	cb = MeshGetBuffer(mesh, TV_VERTEX_ATTR_COL);
+	if (cb == NULL) {
+		return;
+	}
+
+	for (i = 0; i < (mesh->numVerts * 4); i += 4) {
+		cb[i + 0] = r;
+		cb[i + 1] = g;
+		cb[i + 2] = b;
+		cb[i + 3] = a;
+	}
 }

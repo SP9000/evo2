@@ -5,12 +5,12 @@
 #include "vector.h"
 
 /*
- * tv_AttrType is an enumeration of all recognized per-vertex attributes.
+ * MeshAttrType is an enumeration of all recognized per-vertex attributes.
  * Attributes are added to a vertex in order of this enumeration, so you may
  * assume that a vertex containing, e.g. position in color is formatted as:
  *  pos<vector3>, color<vector3>.
  */
-enum tv_AttrType {
+enum MeshAttrType {
 	TV_VERTEX_ATTR_START = 1 << 0,
 	TV_VERTEX_ATTR_POS = 1 << 0,
 	TV_VERTEX_ATTR_COL = 1 << 1,
@@ -27,6 +27,9 @@ enum tv_VertexPrimitive {
 	TV_VERTEX_PRIMITIVE_TRIANGLE_STRIP,
 	TV_VERTEX_PRIMITIVE_TRIANGLE_QUADS,
 	TV_VERTEX_PRIMITIVE_TRIANGLE_LINES
+};
+
+enum { MESH_MAX_VERTEX_ATTRIBUTES = 8,
 };
 
 /* MeshPos is a struct that represents an XYZW vertex position. */
@@ -71,12 +74,16 @@ struct Mesh {
 	uint16_t numVerts;
 	uint16_t primitive;
 	uint8_t numBuffs;
+	enum MeshAttrType attributes[MESH_MAX_VERTEX_ATTRIBUTES];
 	uint8_t buffers[];
 };
 
 struct Mesh NewMesh(uint16_t, uint16_t);
 size_t MeshSize(struct Mesh *);
 struct Mesh MeshNewQuad();
-uint8_t *MeshGetBuffer(struct Mesh *, unsigned);
+uint8_t *MeshGetBufferAt(struct Mesh *, unsigned);
+uint8_t *MeshGetBuffer(struct Mesh *, enum MeshAttrType);
+
+void MeshColor(struct Mesh *, uint8_t, uint8_t, uint8_t, uint8_t);
 
 #endif
