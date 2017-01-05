@@ -2,6 +2,7 @@
 #include "components/enum.h"
 #include "components/particles.h"
 #include "system.h"
+#include "systems.h"
 
 #define MAX_PARTICLES 10000
 
@@ -65,5 +66,5 @@ void InitParticlesSystem() {
 	    .Implements = implements,
 	    .GlobalUpdate = globalUpdate,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_PARTICLES);
 }

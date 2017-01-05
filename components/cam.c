@@ -12,7 +12,7 @@ struct Cam NewCam() {
 	                .pos = {0, 0, 0},
 	                .rot = {0, 0, 0},
 	                .viewport = {0, 0, 640, 480}};
-	mat4x4_perspective(&c.proj, 45.0f, 640.0f / 480.0f, 0, 100);
+	mat4x4_perspective(&c.proj, 30.0f, 640.0f / 480.0f, 0, 100);
 	return c;
 }
 

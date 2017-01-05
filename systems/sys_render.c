@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "draw.h"
 #include "system.h"
+#include "systems.h"
 
 #define SYSTEM_RENDER_MAX_MESHES 2048
 #define SYSTEM_RENDER_MAX_CAMS 8
@@ -65,11 +66,11 @@ static void render() {
 	for (i = 0; i < SYSTEM_RENDER_MAX_MESHES; ++i) {
 		if (meshes[i].mesh != NULL) {
 			struct Mat4x4 mv = Mat4x4Identity;
-
 			struct meshinfo *m = &meshes[i];
+
 			if (cam != NULL) {
-				mat4x4_rotate_y(&mv, cam->rot.y);
 				mat4x4_rotate_x(&mv, cam->rot.x);
+				mat4x4_rotate_y(&mv, cam->rot.y);
 				mat4x4_translate(&mv, -cam->pos.x, -cam->pos.y,
 				                 -cam->pos.z);
 			}
@@ -90,5 +91,5 @@ void InitRenderSystem() {
 	                        .Update = update,
 	                        .Implements = NULL,
 	                        .GlobalUpdate = render};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_RENDER);
 }

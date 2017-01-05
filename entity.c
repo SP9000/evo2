@@ -43,6 +43,7 @@ struct tv_Entity *tv_EntityNew(int count, ...) {
 	}
 
 	strcpy(e->name, "unnamed");
+	e->enabled = true;
 
 	entities[numentities] = e;
 	numentities++;
@@ -87,13 +88,13 @@ void tv_EntityUpdateAll(bool (*test)(struct tv_Entity *),
 
 	if (cache[0] != NULL) {
 		for (i = 0; i < TV_SYSTEM_CACHE_SIZE; ++i)
-			if (cache[i] != NULL)
+			if (cache[i] != NULL && cache[i]->enabled)
 				update(cache[i]);
 		return;
 	}
 
 	for (i = 0, updated = 0; i < numentities; ++i) {
-		if (test(entities[i]))
+		if (entities[i]->enabled && test(entities[i]))
 			update(entities[i]);
 	}
 }

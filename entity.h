@@ -26,6 +26,9 @@ struct tv_Entity {
 	/* unique name used to refer to this entity. */
 	char name[TV_ENTITY_NAMELEN];
 
+	/* if false, the entity is not updated. */
+	bool enabled;
+
 	/* component unique identifiers. */
 	uint16_t components[TV_ENTITY_MAX_COMPONENTS];
 

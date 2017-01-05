@@ -1,6 +1,7 @@
 #include "sys_terrain.h"
 #include "components/enum.h"
 #include "system.h"
+#include "systems.h"
 #include <stdbool.h>
 
 /* implements returns true if the entity has Terrain & Mesh components. */
@@ -21,5 +22,5 @@ void InitTerrainSystem() {
 	    .Implements = implements,
 	    .GlobalUpdate = NULL,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_TERRAIN);
 }

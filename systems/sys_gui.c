@@ -3,6 +3,7 @@
 #include "components/gui.h"
 #include "draw.h"
 #include "gui.h"
+#include "systems.h"
 #include <system.h>
 
 bool implements(struct tv_Entity *e) {
@@ -30,5 +31,5 @@ void InitGUISystem() {
 	    .Implements = implements,
 	    .GlobalUpdate = NULL,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_GUI);
 }

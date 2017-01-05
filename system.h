@@ -13,7 +13,8 @@
  * iterating through the global entity list, or both.
  */
 struct tv_System {
-	bool enabled;                       /* if false, system will not run. */
+	bool enabled; /* if false, system will not run. */
+	unsigned id;  /* a unique identifier for this system. */
 	void (*Start)(struct tv_Entity *);  /* starts components (run-once). */
 	void (*Update)(struct tv_Entity *); /* updates an entity per-frame. */
 	bool (*Implements)(
@@ -25,8 +26,11 @@ struct tv_System {
 
 enum { TV_NUM_SYSTEMS = 1024, TV_SYSTEM_INVALID };
 
-void tv_RegisterSystem(struct tv_System *);
+void tv_RegisterSystem(struct tv_System *, unsigned id);
 void tv_SystemStart();
 void tv_SystemUpdate();
+void tv_SystemEnable(unsigned);
+void tv_SystemDisable(unsigned);
+bool tv_SystemEnabled(unsigned);
 
 #endif
