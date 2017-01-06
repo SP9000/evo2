@@ -18,6 +18,7 @@ static int numCams;
 
 // XXX: proper scenegraph
 static struct meshinfo {
+	struct tv_Entity *e;
 	struct Mesh *mesh;
 	struct Transform *transform;
 	struct Material *mat;
@@ -47,6 +48,7 @@ static void start(struct tv_Entity *e) {
 		// XXX: insert into scenegraph
 		for (i = 0; i < SYSTEM_RENDER_MAX_MESHES; ++i) {
 			if (meshes[i].mesh == NULL) {
+				meshes[i].e = e;
 				meshes[i].mesh = mesh;
 				meshes[i].mat = mat;
 				meshes[i].transform = transform;
@@ -56,32 +58,32 @@ static void start(struct tv_Entity *e) {
 	}
 }
 
-/* update does nothing. */
-static void update(struct tv_Entity *e) {}
+/* implements returns true if e is can be used by the render system. */
+static bool implements(struct tv_Entity *e) {
+	return (tv_EntityGetComponent(e, COMPONENT_TRANSFORM) != NULL) &&
+	       (tv_EntityGetComponent(e, COMPONENT_MESH) != NULL);
+}
 
-/* render renders the scene as seen by cam. */
-static void render() {
-	int i;
-	// XXX: render from scenegraph
-	for (i = 0; i < SYSTEM_RENDER_MAX_MESHES; ++i) {
-		if (meshes[i].mesh != NULL) {
-			struct Mat4x4 mv = Mat4x4Identity;
-			struct meshinfo *m = &meshes[i];
+/* update renders e. */
+static void update(struct tv_Entity *e) {
+	struct Mesh *mesh;
+	struct Material *mat;
+	struct Transform *t;
+	struct Mat4x4 mv = Mat4x4Identity;
 
-			if (cam != NULL) {
-				mat4x4_rotate_x(&mv, cam->rot.x);
-				mat4x4_rotate_y(&mv, cam->rot.y);
-				mat4x4_translate(&mv, -cam->pos.x, -cam->pos.y,
-				                 -cam->pos.z);
-			}
+	mesh = (struct Mesh *)tv_EntityGetComponent(e, COMPONENT_MESH);
+	mat = (struct Material *)tv_EntityGetComponent(e, COMPONENT_MATERIAL);
+	t = (struct Transform *)tv_EntityGetComponent(e, COMPONENT_TRANSFORM);
 
-			mat4x4_translate(&mv, m->transform->pos.x,
-			                 m->transform->pos.y,
-			                 m->transform->pos.z);
-			tv_DrawModelview(&mv);
-			tv_Draw(cams[0], m->mesh, m->mat);
-		}
+	if (cam != NULL) {
+		mat4x4_rotate_x(&mv, cam->rot.x);
+		mat4x4_rotate_y(&mv, cam->rot.y);
+		mat4x4_translate(&mv, -cam->pos.x, -cam->pos.y, -cam->pos.z);
 	}
+
+	mat4x4_translate(&mv, t->pos.x, t->pos.y, t->pos.z);
+	tv_DrawModelview(&mv);
+	tv_Draw(cams[0], mesh, mat);
 }
 
 /* InitRenderSystem initializes the rendering system. */
@@ -89,7 +91,10 @@ void InitRenderSystem() {
 	struct tv_System sys = {.enabled = true,
 	                        .Start = start,
 	                        .Update = update,
-	                        .Implements = NULL,
-	                        .GlobalUpdate = render};
+	                        .Implements = implements,
+	                        .GlobalUpdate = NULL};
 	tv_RegisterSystem(&sys, SYSTEM_RENDER);
 }
+
+/* RenderSetEye sets the transform for the view the system renders from. */
+void RenderSetEye(struct Transform *t) { cam = t; }
