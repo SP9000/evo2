@@ -1,0 +1,13 @@
+#ifndef SYSTEMS_H
+#define SYSTEMS_H
+
+enum tv_BaseSystems {
+	SYSTEM_NONE,
+	SYSTEM_GUI,
+	SYSTEM_RENDER,
+	SYSTEM_PARTICLES,
+	SYSTEM_TERRAIN,
+	SYSTEM_APP_START,
+};
+
+#endif
