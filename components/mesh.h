@@ -29,8 +29,7 @@ enum tv_VertexPrimitive {
 	TV_VERTEX_PRIMITIVE_TRIANGLE_LINES
 };
 
-enum { MESH_MAX_VERTEX_ATTRIBUTES = 8,
-};
+enum { MESH_MAX_VERTEX_ATTRIBUTES = 8, MESH_MAX_VERTICES = 4096 };
 
 /* MeshPos is a struct that represents an XYZW vertex position. */
 struct MeshPos {
@@ -70,6 +69,7 @@ struct MeshBuffer {
 /* Mesh is a component that all associated buffers needed to render geometry. */
 struct Mesh {
 	TV_COMPONENT
+	const char *path;
 	struct AABB aabb;
 	uint16_t numVerts;
 	uint16_t primitive;

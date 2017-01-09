@@ -103,6 +103,42 @@ static void makeQuad(void *c) {
 	memcpy(cb, col, sizeof(col));
 };
 
+/* makeObj loads the .OBJ data stored in mesh's path */
+static void makeObj(void *c) {
+	unsigned i;
+	char line[256];
+	FILE *f;
+	uint8_t *pv;
+	float x, y, z;
+	struct Mesh *mesh;
+
+	mesh = (struct Mesh *)c;
+	if (mesh->path == NULL) {
+		return;
+	}
+
+	f = fopen(mesh->path, "r");
+	pv = MeshGetBuffer(mesh, TV_VERTEX_ATTR_POS);
+	for (i = 0; fgets(line, sizeof(line), f) == NULL;) {
+		if (sscanf(line, "v %f, %f, %f", &x, &y, &z) == 3) {
+			pv[i++] = (uint8_t)(x * 255.0f);
+			pv[i++] = (uint8_t)(y * 255.0f);
+			pv[i++] = (uint8_t)(z * 255.0f);
+			pv[i++] = (uint8_t)(255.0f);
+		}
+
+		if (i >= (mesh->numVerts / 4)) {
+			debug_printf("file %s contains more vertices than "
+			             "space has been allocated",
+			             mesh->path);
+			goto cleanup;
+		}
+	}
+
+cleanup:
+	fclose(f);
+}
+
 /* tv_NewMesh creates a new mesh pre-allocated with room for n vertices. */
 struct Mesh NewMesh(uint16_t n, uint16_t buffs) {
 	// XXX: stupidly reserves 16 bytes per vertex regardless of attribute
@@ -126,6 +162,19 @@ struct Mesh MeshNewQuad() {
 	    .primitive = TV_VERTEX_PRIMITIVE_TRIANGLES,
 	    .numVerts = 6,
 	    .numBuffs = 0,
+	};
+	return mesh;
+}
+
+/* MeshNewObj creates a new mesh to be loaded with the given .OBJ file data. */
+struct Mesh MeshNewObj(const char *filename) {
+	struct Mesh mesh = {
+	    .C = {.size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
+	          .init = makeObj},
+	    .primitive = TV_VERTEX_PRIMITIVE_TRIANGLES,
+	    .numVerts = 6,
+	    .numBuffs = 0,
+	    .path = filename,
 	};
 	return mesh;
 }
