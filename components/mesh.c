@@ -109,7 +109,6 @@ static void makeObj(void *c) {
 	char line[256];
 	FILE *f;
 	uint8_t *pv;
-	float x, y, z;
 	struct Mesh *mesh;
 
 	mesh = (struct Mesh *)c;
@@ -118,8 +117,20 @@ static void makeObj(void *c) {
 	}
 
 	f = fopen(mesh->path, "r");
+	if (f == NULL) {
+		debug_printf("failed to open file %s for loading\n",
+		             mesh->path);
+		return;
+	}
+
 	pv = MeshGetBuffer(mesh, TV_VERTEX_ATTR_POS);
-	for (i = 0; fgets(line, sizeof(line), f) == NULL;) {
+	if (pv == NULL) {
+		debug_puts("mesh has no vertex buffer");
+		goto cleanup;
+	}
+
+	for (i = 0; fgets(line, sizeof(line), f) != NULL;) {
+		float x, y, z;
 		if (sscanf(line, "v %f, %f, %f", &x, &y, &z) == 3) {
 			pv[i++] = (uint8_t)(x * 255.0f);
 			pv[i++] = (uint8_t)(y * 255.0f);
@@ -159,7 +170,7 @@ struct Mesh MeshNewQuad() {
 	struct Mesh mesh = {
 	    .C = {.size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
 	          .init = makeQuad},
-	    .primitive = TV_VERTEX_PRIMITIVE_TRIANGLES,
+	    .primitive = TV_VERTEX_PRIMITIVE_LINES,
 	    .numVerts = 6,
 	    .numBuffs = 0,
 	};
@@ -172,8 +183,8 @@ struct Mesh MeshNewObj(const char *filename) {
 	    .C = {.size = sizeof(struct Mesh) + 6 * sizeof(struct MeshAttr) * 2,
 	          .init = makeObj},
 	    .primitive = TV_VERTEX_PRIMITIVE_TRIANGLES,
-	    .numVerts = 6,
-	    .numBuffs = 0,
+	    .numVerts = 256, // XXX
+	    .numBuffs = 2,
 	    .path = filename,
 	};
 	return mesh;

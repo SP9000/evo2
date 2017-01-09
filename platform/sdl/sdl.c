@@ -292,7 +292,16 @@ void tv_Draw(struct Cam *cam, struct Mesh *mesh, struct Material *mat) {
 	glBindBuffer(GL_ARRAY_BUFFER, m->buffs.col);
 	glVertexAttribPointer(m->attrs.col, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, m->mesh->numVerts);
+	switch (m->mesh->primitive) {
+	case TV_VERTEX_PRIMITIVE_TRIANGLES:
+		glDrawArrays(GL_TRIANGLES, 0, m->mesh->numVerts);
+		break;
+	case TV_VERTEX_PRIMITIVE_LINES:
+		glDrawArrays(GL_TRIANGLES, 0, m->mesh->numVerts);
+		break;
+	default:
+		debug_printf("Unknown primitive %d\n", m->mesh->primitive);
+	}
 	glBindVertexArray(0);
 }
 

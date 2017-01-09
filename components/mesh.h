@@ -26,7 +26,7 @@ enum tv_VertexPrimitive {
 	TV_VERTEX_PRIMITIVE_TRIANGLES,
 	TV_VERTEX_PRIMITIVE_TRIANGLE_STRIP,
 	TV_VERTEX_PRIMITIVE_TRIANGLE_QUADS,
-	TV_VERTEX_PRIMITIVE_TRIANGLE_LINES
+	TV_VERTEX_PRIMITIVE_LINES
 };
 
 enum { MESH_MAX_VERTEX_ATTRIBUTES = 8, MESH_MAX_VERTICES = 4096 };
@@ -81,6 +81,7 @@ struct Mesh {
 struct Mesh NewMesh(uint16_t, uint16_t);
 size_t MeshSize(struct Mesh *);
 struct Mesh MeshNewQuad();
+struct Mesh MeshNewObj(const char *);
 uint8_t *MeshGetBufferAt(struct Mesh *, unsigned);
 uint8_t *MeshGetBuffer(struct Mesh *, enum MeshAttrType);
 void MeshSetVertices(struct Mesh *mesh, uint16_t *);
