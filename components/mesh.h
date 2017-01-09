@@ -83,6 +83,7 @@ size_t MeshSize(struct Mesh *);
 struct Mesh MeshNewQuad();
 uint8_t *MeshGetBufferAt(struct Mesh *, unsigned);
 uint8_t *MeshGetBuffer(struct Mesh *, enum MeshAttrType);
+void MeshSetVertices(struct Mesh *mesh, uint16_t *);
 
 void MeshColor(struct Mesh *, uint8_t, uint8_t, uint8_t, uint8_t);
 

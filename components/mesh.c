@@ -174,3 +174,20 @@ void MeshColor(struct Mesh *mesh, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 		cb[i + 3] = a;
 	}
 }
+
+/* MeshSetVertices sets the vertices of mesh to vertices. */
+void MeshSetVertices(struct Mesh *mesh, uint16_t *vertices) {
+	unsigned i;
+	uint8_t *vb;
+
+	vb = MeshGetBuffer(mesh, TV_VERTEX_ATTR_POS);
+	if (vb == NULL) {
+		return;
+	}
+
+	for (i = 0; i < (mesh->numVerts * 3); i += 3) {
+		vb[i + 0] = vertices[i];
+		vb[i + 1] = vertices[i + 1];
+		vb[i + 2] = vertices[i + 2];
+	}
+}
